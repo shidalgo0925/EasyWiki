@@ -94,6 +94,7 @@ Lista completa con nombres en pantalla: [[03_Productos/en1_platform#Catálogo de
 - [[03_Productos/en1_platform]]
 - [[07_Operaciones/modulo_taller]]
 - [[06_Arquitectura/arquitectura_api]]
+- [[06_Arquitectura/servidores/README]] — fichas CODITO, OCI, TAMAL, etc.
 - [[04_Clientes/iius]] · [[04_Clientes/modecosa]]
 
 ---

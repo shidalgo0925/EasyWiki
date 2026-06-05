@@ -17,6 +17,7 @@ Bienvenido a la **wiki operativa** de [[01_Empresa/easytechnology|Easy Technolog
 |-----|------|
 | Dirección / ventas | [[09_Marketing/marketing_hub]], [[02_Suite/mapa_suite]] |
 | Implementación EN1 | [[03_Productos/en1_platform]], [[04_Clientes/iius]], [[04_Clientes/modecosa]], [[07_Operaciones/modulo_taller]] |
+| Infraestructura / servidores | [[06_Arquitectura/servidores/README]] · [[06_Arquitectura/servidores/CODITO]] |
 | Punto de venta | [[03_Productos/eposone]] |
 | Operaciones | [[07_Operaciones/deploy]], [[07_Operaciones/soporte]], [[07_Operaciones/qa]] |
 
