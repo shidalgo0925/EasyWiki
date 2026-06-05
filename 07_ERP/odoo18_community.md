@@ -90,6 +90,27 @@ MuK Backend Theme desplegado en todas las bases activas:
 
 ---
 
+## Backup PostgreSQL (manual — Fase 2)
+
+| Campo | Valor |
+|---|---|
+| **Estado** | **Validado manualmente** — 2026-06-05 |
+| **Base de prueba** | `Easydb` |
+| **Archivo** | `Easydb_2026-06-05.dump` |
+| **Tamaño** | 9.7 MB |
+| **Formato** | `pg_dump -Fc` (PostgreSQL 16.14) |
+| **Local TAMAL** | `/backups/tamal/db/` |
+| **Remoto OCI** | `backupsrv@40.233.1.138:/backups/tamal/` |
+| **Integridad** | `pg_restore --list` OK — 11 513 TOC entries |
+| **Transferencia OCI** | **Validada** vía `scp` + clave `id_ed25519_backup_oci` |
+| **Automatización** | **No** — sin cron (Fase 2 solo demostración) |
+
+Procedimiento completo: [[06_Arquitectura/servidores/TAMAL#Backup Hub OCI — Fase 2 (PostgreSQL manual)]].
+
+**Pendiente Fase 3+:** replicar para `lahuaca`, `SMRC`, `TTTourism` y resto de bases; luego cron/script.
+
+---
+
 ## Riesgos específicos Odoo 18 en TAMAL
 
 1. Única instancia para todos los tenants

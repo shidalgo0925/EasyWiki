@@ -7,7 +7,7 @@
 | **Proveedor** | Contabo (AS40021) |
 | **Rol** | Servidor ERP principal multi-tenant Odoo 18 Community |
 | **Estado inspección** | 2026-06-04 — DOCUMENTADO |
-| **Backup Hub OCI** | Fase 1 — **VALIDADA** (2026-06-05) |
+| **Backup Hub OCI** | Fase 1 ✅ · Fase 2 (PG manual) ✅ — 2026-06-05 |
 | **Restricción aplicada** | Solo lectura; sin reinicios ni cambios |
 
 ---
@@ -318,9 +318,71 @@ test TAMAL to OCI 2026-06-05 04:10:47 UTC
 | Transferencia archivo prueba | ✅ (`scp`; rsync pendiente instalar/enabled en OCI) |
 | Evidencia en `/backups/tamal/` | ✅ |
 
-### Nota Fase 2
+### Nota transferencia
 
-Para backups con `rsync`, instalar `rsync` en OCI accesible para `backupsrv`, o usar **`scp`** en scripts de backup (compatible con claves `restrict`).
+Para backups con `rsync`, instalar `rsync` en OCI accesible para `backupsrv`, o usar **`scp`** en scripts de backup (compatible con claves `restrict`). Fase 2 usa **scp**.
+
+---
+
+## Backup Hub OCI — Fase 2 (PostgreSQL manual)
+
+**Objetivo:** exportar base Odoo, transferir a OCI, verificar integridad. **Sin cron / sin automatización.**
+
+### Estructura local TAMAL
+
+| Ruta | Uso |
+|---|---|
+| `/backups/tamal/db/` | Dumps PostgreSQL |
+| `/backups/tamal/logs/` | Logs futuros (vacío en Fase 2) |
+
+### Backup validado — Easydb (2026-06-05)
+
+| Campo | Valor |
+|---|---|
+| **Base** | `Easydb` (Easy Technology Services — interno) |
+| **Archivo local** | `/backups/tamal/db/Easydb_2026-06-05.dump` |
+| **Archivo OCI** | `/backups/tamal/Easydb_2026-06-05.dump` |
+| **Formato** | PostgreSQL custom (`pg_dump -Fc`) |
+| **Tamaño** | **9.7 MB** (TAMAL y OCI coinciden) |
+| **Fecha dump** | 2026-06-05 06:14:07 CEST |
+| **PostgreSQL origen** | 16.14 (Ubuntu 16.14-0ubuntu0.24.04.1) |
+| **TOC entries** | 11 513 |
+| **Integridad** | `pg_restore --list` — **OK** (11 524 líneas, sin errores) |
+| **Transferencia** | `scp` vía `/root/.ssh/id_ed25519_backup_oci` → `backupsrv@40.233.1.138:/backups/tamal/` |
+
+**Bases excluidas en Fase 2** (hasta repetir procedimiento): `lahuaca`, `SMRC`, `TTTourism`, `Sanadb`, `relatic`, `odoo18`.
+
+### Procedimiento manual (referencia)
+
+```bash
+# 1. Dump (usuario postgres; salida en path root)
+sudo sh -c 'sudo -u postgres pg_dump -Fc Easydb > /backups/tamal/db/Easydb_$(date +%F).dump'
+
+# 2. Integridad local
+pg_restore --list /backups/tamal/db/Easydb_$(date +%F).dump | head
+
+# 3. Transferir a OCI
+scp -i /root/.ssh/id_ed25519_backup_oci -o IdentitiesOnly=yes \
+  /backups/tamal/db/Easydb_$(date +%F).dump \
+  backupsrv@40.233.1.138:/backups/tamal/
+
+# 4. Verificar en OCI
+ssh -i /root/.ssh/id_ed25519_backup_oci -o IdentitiesOnly=yes \
+  backupsrv@40.233.1.138 'ls -lh /backups/tamal/*.dump'
+```
+
+**Nota:** `postgres` no escribe directo en `/backups/tamal/db/` (permisos root); usar redirección con `sudo sh -c` como arriba.
+
+### Checklist Fase 2
+
+| Paso | Estado |
+|---|---|
+| Estructura `/backups/tamal/{db,logs}` | ✅ |
+| Dump `Easydb` generado | ✅ |
+| `pg_restore --list` sin errores | ✅ |
+| Transferencia scp → OCI | ✅ |
+| Dump visible en OCI (tamaño coincide) | ✅ |
+| Cron / automatización | ❌ No creado (deliberado) |
 
 ---
 
