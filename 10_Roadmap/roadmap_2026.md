@@ -7,6 +7,8 @@ Prioridades de **Easy Technology Services** y [[02_Suite/easy_suite|Easy Suite]]
 
 Consolidar **Easy Wiki**, estabilizar **EN1 en clientes clave** y avanzar productos satélite con mensaje comercial claro.
 
+**Inventario productos en CODITO:** [[02_Suite/inventario_easy_suite]] (jun 2026).
+
 ## Q1–Q2 2026 (en curso / reciente)
 
 | Prioridad | Tema | Resultado esperado |

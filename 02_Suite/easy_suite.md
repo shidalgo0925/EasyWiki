@@ -19,6 +19,8 @@ Un cliente puede empezar con **un módulo** (eventos, tienda, campus) y crecer h
 
 Mapa visual: [[02_Suite/mapa_suite]].
 
+**Inventario en servidor CODITO** (productos desplegados, rutas, Git, dominios): [[02_Suite/inventario_easy_suite]].
+
 ## Naming
 
 Convenciones de nombres y marcas: [[02_Suite/naming_standards]].

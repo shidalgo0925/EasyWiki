@@ -4,7 +4,19 @@
 
 ## Estado en suite
 
-Producto definido en la **marca Easy Suite**. La implementación concreta (módulos EN1, formularios, integración con campus) se acuerda **por proyecto** — no es el mismo paquete estándar que IIUS/campus cerrado.
+Producto de marca **Easy Suite** con **implementación desplegada en CODITO** (jun 2026) en modo **laboratorio / demo operativa** — no es el mismo paquete comercial cerrado que IIUS/campus EN1.
+
+## Presencia en CODITO (jun 2026)
+
+| Campo | Valor |
+|-------|-------|
+| Ruta | `/opt/easythesis/app` |
+| Repo | `github.com/shidalgo0925/Ethesis` · rama `main` |
+| BD | `easythesis_dev` |
+| Dominios | `ethesis.site`, `ethesis.etsrv.site` |
+| Servicio | `easythesis-dev.service` (Gunicorn :9201) |
+
+Detalle: [[02_Suite/inventario_easy_suite]] · handoff EN1: `/opt/handoff-plataformas/`.
 
 ## Para qué sirve (visión)
 

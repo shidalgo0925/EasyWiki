@@ -87,6 +87,19 @@ Easy Technology despliega EN1 en silos controlados:
 
 **Regla:** no se edita código a mano en staging/prod; solo actualización desde Git + migraciones + reinicio. Detalle: [[07_Operaciones/deploy]].
 
+## Presencia en CODITO (jun 2026)
+
+Host compartido `194.60.201.29` — inventario completo: [[02_Suite/inventario_easy_suite]].
+
+| Silo | Dominio | BD | Comercial |
+|------|---------|-----|-----------|
+| Dev | `appdev.easynodeone.com` | `easynodeone_dev` | Laboratorio |
+| Staging | `apptst.easynodeone.com` | `easynodeone_staging` | Staging |
+| Prod | `appprd.easynodeone.com` | `easynodeone_prod` | Producción |
+| Relatic | `apps.relatic.org`, `miembros.relatic.org` | `easynodeone_relatic` | Producción (cliente) |
+
+Repo: `github.com/shidalgo0925/Easy-NodeOne` · ramas `develop` (dev/relatic) y `main` (staging/prod).
+
 Proyecto interno wiki: `05_Proyectos/en1/`
 
 ## Clientes de referencia en wiki

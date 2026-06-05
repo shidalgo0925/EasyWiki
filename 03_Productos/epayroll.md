@@ -4,7 +4,9 @@
 
 ## Estado en suite
 
-Marca comercial de la suite. La integración con [[03_Productos/en1_platform|EN1]] (empleados como contactos, centros de costo, contabilidad) se define **por contrato**.
+Marca comercial de la suite. **Sin despliegue en CODITO** (jun 2026) — solo documentación wiki y placeholder de proyecto.
+
+La integración con [[03_Productos/en1_platform|EN1]] (empleados como contactos, centros de costo, contabilidad) se define **por contrato**.
 
 ## Para qué sirve (visión)
 

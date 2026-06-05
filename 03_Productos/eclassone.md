@@ -30,6 +30,20 @@ En implementaciones como [[04_Clientes/iius]], la **lógica operativa** (program
 
 Easy Technology configura tenant, política de campus y branding antes de go-live.
 
+## Presencia en CODITO (jun 2026)
+
+Aplicación **EClassOne** desplegada en `/opt/easyclassone/{dev,staging,prod}/app` — Flask + Gunicorn + PostgreSQL. **Sin repositorio Git local** en el servidor (confirmar origen remoto).
+
+| Silo | Dominio | BD | Comercial |
+|------|---------|-----|-----------|
+| Dev | `appdev.eclassone.com` | `easyclassone_dev` | Laboratorio |
+| Staging | `appstaging.eclassone.com` | `easyclassone_staging` | Staging |
+| Prod | `app.eclassone.com` | `easyclassone_prod` | Producción |
+
+Landing estática: `eclassone.com` → `/var/www/eclassone`.
+
+Detalle: [[02_Suite/inventario_easy_suite]].
+
 **Cliente referencia:** [[04_Clientes/iius]] · **Proyecto:** `05_Proyectos/iius/`
 
 ---

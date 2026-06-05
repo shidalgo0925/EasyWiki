@@ -49,11 +49,14 @@ Vista rápida de **qué vendemos** y **cómo se relaciona** cada pieza.
 | [[04_Clientes/iius]] | Campus académico, inscripciones, programas |
 | [[04_Clientes/modecosa]] | ERP Odoo + catálogo EN1 |
 | [[04_Clientes/rycom]] | *(completar ficha)* |
+| **Relatic Panamá** | EN1 producción en CODITO — ver [[06_Arquitectura/servidores/CODITO]] · [[02_Suite/inventario_easy_suite]] |
 | Otros | [[04_Clientes/clientes_generales]] |
 
 ## Roadmap de la suite
 
 [[10_Roadmap/roadmap_2026]] — prioridades 2026.
+
+**Despliegue real (jun 2026):** EN1 y Relatic en producción en CODITO; EClassOne y EThesisOne en laboratorio/staging — detalle en [[02_Suite/inventario_easy_suite]].
 
 ---
 

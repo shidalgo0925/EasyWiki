@@ -2,6 +2,8 @@
 
 Centro de **mensajes, productos promocionables y campañas** de [[01_Empresa/easytechnology|Easy Technology Services]] y [[02_Suite/easy_suite|Easy Suite]].
 
+> **Nota:** Marketing Hub es **documentación comercial en Easy Wiki**, no una aplicación desplegada. Los productos que promociona pueden tener instancias en servidores como CODITO — ver [[02_Suite/inventario_easy_suite]].
+
 ## Mensaje principal
 
 > **Easy Technology Services** implementa **Easy Suite**: plataformas que ordenan ventas, operaciones, educación y cobros — con un socio local que acompaña de punta a punta.
