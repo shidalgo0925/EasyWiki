@@ -7,7 +7,7 @@
 | **Proveedor** | Contabo (AS40021) |
 | **Rol** | Servidor ERP principal multi-tenant Odoo 18 Community |
 | **Estado inspección** | 2026-06-04 — DOCUMENTADO |
-| **Backup Hub OCI** | Fase 1 ✅ · Fase 2 ✅ · Fase 2.5 ✅ · **Fase 3 script** ✅ — 2026-06-05 |
+| **Backup Hub OCI** | Fase 1–3 ✅ · **Fase 5 restore** ✅ — 2026-06-05 |
 | **Restricción aplicada** | Solo lectura; sin reinicios ni cambios |
 
 ---
@@ -160,7 +160,7 @@ Copia desarrollo FE: `/home/admin/FE_HKA_OCI/` (versión más nueva que producci
 
 | Tipo | Estado | Frecuencia | Destino | Observaciones |
 |---|---|---|---|---|
-| **Bases de datos PostgreSQL** | Script manual Fase 3 | Bajo demanda | TAMAL `/backups/tamal/db/YYYY-MM-DD/` + OCI `/backups/tamal/YYYY-MM-DD/` | **Sin cron** — script `/usr/local/bin/backup_postgresql_tamal.sh`; restauración real pendiente Fase 5 |
+| **Bases de datos PostgreSQL** | Script manual Fase 3 + **restore validado Fase 5** | Bajo demanda | TAMAL + OCI | **Sin cron** — backup **recuperable** confirmado en Easydb |
 | **Código custom addons** | Manual | Único hallado: 2025-10-20 | `/home/admin/odoo18_custom_modules_20251020_021812.tar.gz` (79 MB) | Desactualizado (>7 meses) |
 | **FE_HKA_OCI** | Git | Bajo demanda | GitHub `shidalgo0925/FE_HKA_OCI` | Backup local adicional `FE_HKA_OCI_backup_20260306` |
 | **Filestore Odoo** | Sin backup dedicado | — | `/var/lib/odoo/filestore` (283 MB) | Incluye adjuntos de todas las BD |
@@ -441,7 +441,7 @@ Mismos archivos en `backupsrv@40.233.1.138:/backups/tamal/`.
 | Transferencia scp → OCI (todas) | ✅ |
 | Tamaños coinciden TAMAL = OCI | ✅ |
 | Tabla inventario documentada | ✅ |
-| Restauración completa probada | ❌ Pendiente **Fase 5** |
+| Restauración completa probada | ✅ **Fase 5** (Easydb) |
 | Script `backup_postgresql_tamal.sh` | ✅ **Fase 3** |
 | Cron 02:00 / 03:00 / 04:00 | ❌ Pendiente **Fase 4** |
 
@@ -453,7 +453,7 @@ Mismos archivos en `backupsrv@40.233.1.138:/backups/tamal/`.
 | **2.5** | Inventario tamaños todas las bases prod. | ✅ |
 | **3** | Script `backup_postgresql_tamal.sh` (6 bases → carpeta `YYYY-MM-DD/`) | ✅ |
 | **4** | Automatización: 02:00 dump · 03:00 scp OCI · 04:00 verificación | Pendiente |
-| **5** | **Prueba restauración real** — backup no existe hasta validar recover | Pendiente |
+| **5** | **Prueba restauración real** — backup no existe hasta validar recover | ✅ (Easydb) |
 
 ---
 
@@ -518,6 +518,68 @@ Mismos archivos en `backupsrv@40.233.1.138:/backups/tamal/`.
 | Dumps anteriores no borrados | ✅ |
 | Cron / systemd timer | ❌ No creado (deliberado) |
 | Odoo / PostgreSQL sin cambios | ✅ |
+
+---
+
+## Backup Hub OCI — Fase 5 (restauración real)
+
+**Objetivo:** confirmar que un dump generado por el proceso de backup es **recuperable** en PostgreSQL. **Sin conectar Odoo, sin nginx, sin cron.**
+
+### Alcance de la prueba (2026-06-05)
+
+| Campo | Valor |
+|---|---|
+| **Base origen (dump)** | `Easydb` |
+| **Archivo dump** | `/backups/tamal/db/2026-06-05/Easydb.dump` (9.7 MB, Fase 3) |
+| **Base temporal** | `Easydb_restore_test_20260605` |
+| **Comando restore** | `pg_restore -d Easydb_restore_test_20260605 --no-owner --no-acl` |
+| **Duración restore** | ~34 s |
+| **Exit code pg_restore** | **0** (sin errores críticos) |
+| **Base original Easydb** | **No modificada** (solo lecturas de comparación) |
+| **Odoo productivo** | **No conectado** a la base temporal |
+| **Base temporal final** | **Eliminada** (`dropdb`) tras validación |
+
+### Validaciones SQL
+
+| Check | Original `Easydb` | Restaurada (temp) | Resultado |
+|---|---:|---:|---|
+| Tamaño BD | 62 MB | 59 MB | ✅ Comparable (~95%) |
+| Tablas `public` | 580 | 580 | ✅ Igual |
+| `res_company` | 1 | 1 | ✅ |
+| `res_users` | 7 | 7 | ✅ |
+| `ir_module_module` | 703 | 703 | ✅ |
+| `account_move` | 12 | 12 | ✅ |
+| Empresa | Easy Technology Services - TML | Idem | ✅ |
+
+**Nota tamaño:** la BD restaurada es ligeramente menor (59 vs 62 MB) por estadísticas/vacuum del origen en vivo; datos y esquema coinciden.
+
+### Restricciones respetadas
+
+- ❌ No se tocó `Easydb` productiva (escritura)
+- ❌ No se modificó Odoo, nginx ni módulos
+- ❌ No se publicó subdominio ni acceso navegador
+- ✅ Solo operaciones PostgreSQL en base temporal aislada
+- ✅ Base temporal eliminada al cerrar la prueba
+
+### Log
+
+`/backups/tamal/logs/restore_easydb_test_2026-06-05.log`
+
+### Checklist Fase 5
+
+| Paso | Estado |
+|---|---|
+| Base temporal creada | ✅ |
+| `pg_restore` completado (exit 0) | ✅ |
+| Tablas Odoo clave presentes | ✅ |
+| Conteos filas = original | ✅ |
+| Odoo no conectado | ✅ |
+| Base temporal eliminada | ✅ |
+| Cron | ❌ No creado (deliberado) |
+
+### Conclusión
+
+El backup PostgreSQL de **Easydb** generado el 2026-06-05 es **recuperable**. El pipeline export → OCI → restore está validado para al menos una base productiva. Pendiente: repetir restore de muestra para bases mayores (`lahuaca`, `relatic`) antes de declarar DR completo; activar cron en **Fase 4** cuando se apruebe.
 
 ---
 
