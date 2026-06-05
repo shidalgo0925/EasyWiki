@@ -16,9 +16,9 @@ Bienvenido a la **wiki operativa** de [[01_Empresa/easytechnology|Easy Technolog
 | Rol | Ir a |
 |-----|------|
 | Dirección / ventas | [[09_Marketing/marketing_hub]], [[02_Suite/mapa_suite]] |
-| Implementación EN1 | [[03_Productos/en1_platform]], [[04_Clientes/iius]], [[04_Clientes/modecosa]] |
+| Implementación EN1 | [[03_Productos/en1_platform]], [[04_Clientes/iius]], [[04_Clientes/modecosa]], [[07_Operaciones/modulo_taller]] |
 | Punto de venta | [[03_Productos/eposone]] |
-| Operaciones | [[07_Operaciones/deploy]], [[07_Operaciones/soporte]] |
+| Operaciones | [[07_Operaciones/deploy]], [[07_Operaciones/soporte]], [[07_Operaciones/qa]] |
 
 ## Carpetas
 
@@ -31,4 +31,4 @@ Bienvenido a la **wiki operativa** de [[01_Empresa/easytechnology|Easy Technolog
 
 ---
 
-Siguiente fase: ampliar proyectos en `05_Proyectos/` y procedimientos en `07_Operaciones/`.
+**Actualización:** documentos ampliados con conocimiento operativo de EN1 (módulos SaaS, IIUS, Modecosa, taller, deploy). Completar en cada proyecto de `05_Proyectos/` los contactos y URLs que solo tiene el equipo.
