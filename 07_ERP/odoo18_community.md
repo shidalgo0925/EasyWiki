@@ -109,7 +109,9 @@ MuK Backend Theme desplegado en todas las bases activas:
 
 Easydb · lahuaca · SMRC · Sanadb · TTTourism · relatic — excluida `odoo18`.
 
-Procedimiento backup/cron: [[06_Arquitectura/servidores/TAMAL#Backup Hub OCI — Fase 4 (cron diario)]].
+Procedimiento DR completo: [[07_ERP/disaster_recovery]].
+
+---
 
 ### Tamaño dump por base (referencia Fase 2.5)
 

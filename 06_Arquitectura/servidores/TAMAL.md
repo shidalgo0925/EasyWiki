@@ -204,11 +204,21 @@ TAMAL es hoy el **único servidor Odoo productivo** identificado para clientes E
 
 ---
 
+## Riesgos críticos — registro
+
+| ID | Riesgo | Severidad | Estado | Fecha cierre | Commit |
+|---|---|---|---|---|---|
+| **R-001** | TAMAL sin backups automáticos de PostgreSQL | **Crítico** | **RESUELTO** | 2026-06-05 | [`63347e9`](https://github.com/shidalgo0925/EasyWiki/commit/63347e9) |
+
+Detalle DR: [[07_ERP/disaster_recovery]].
+
+---
+
 ## Riesgos operativos
 
 | # | Riesgo | Severidad | Impacto si TAMAL cae |
 |---|---|---|---|
-| 1 | Sin backups automáticos de BD | **Crítico** | Pérdida de datos irreversible |
+| ~~1~~ | ~~Sin backups automáticos de BD~~ → **R-001 RESUELTO** | ~~Crítico~~ | Ver [[07_ERP/disaster_recovery]] |
 | 2 | Sin swap (7.8 GB RAM, picos Odoo+PG) | Alto | OOM kill de procesos |
 | 3 | Single point of failure — 1 Odoo, 1 PG | **Crítico** | Todos los clientes ERP offline |
 | 4 | Módulos huérfanos (código ausente) | Alto | Fallos en update/restart de módulos |
@@ -244,8 +254,8 @@ Ver FASE 5 y `07_ERP/catalogo_modulos_easytech.md`. Núcleo: `FE_HKA_OCI`, impor
 
 - **6 clientes ERP** sin acceso a facturación, inventario, contabilidad
 - **3 clientes** sin emisión FE Panamá (SMRC, Sanadb, TTTourism)
-- **La Huaca** pierde operación de 5 600+ facturas históricas
-- Sin backups automáticos de BD, recuperación depende de tar manual oct-2025 y git de FE
+- **La Huaca** pierde operación de ~6 000 facturas históricas (recuperables vía dump OCI — ver [[07_ERP/disaster_recovery]])
+- **Backups BD:** cron diario activo; RPO 24 h; restore validado Easydb + lahuaca
 - EConverso (econverso.com) también cae
 - Certificados y DNS `*.etsrv.site` quedan huérfanos hasta migración
 
@@ -256,7 +266,7 @@ Ver FASE 5 y `07_ERP/catalogo_modulos_easytech.md`. Núcleo: `FE_HKA_OCI`, impor
 - Catálogo módulos EasyTech y estado por cliente
 - Arquitectura FE HKA (flujo, dependencias, clientes activos)
 - Inventario módulos huérfanos y deuda técnica
-- Política de backups (actualmente inexistente — acción requerida)
+- Política de backups → [[07_ERP/disaster_recovery]]
 - Diferencia TAMAL vs OCI (OCI cerrado; TAMAL = ERP Contabo)
 - Repositorio FE: `shidalgo0925/FE_HKA_OCI`
 
