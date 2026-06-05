@@ -254,12 +254,12 @@ Renovación: `certbot.timer` / cron estándar Certbot.
 
 ## Backup Hub
 
-Preparación del host OCI como **receptor de backups** desde otros servidores EasyTech (TAMAL, CODITO, Spaguetti). **Sin rsync, cron ni llaves SSH configuradas aún** — solo infraestructura base (jun 2026).
+Preparación del host OCI como **receptor de backups** desde otros servidores EasyTech (TAMAL, CODITO, Spaguetti). Infraestructura base + **llaves SSH dedicadas** (jun 2026). **Sin rsync ni cron en origen aún.**
 
 | Campo | Valor |
 |-------|-------|
-| **Estado** | **Preparado** |
-| **Usuario** | `backupsrv` *(sin sudo)* |
+| **Estado** | **Listo para recibir backups** — infraestructura y llaves públicas en OCI; privadas pendientes en origen |
+| **Usuario** | `backupsrv` **creado** *(sin sudo)* |
 | **Estado SSH** | **Activo** — puerto **22/tcp** (`ssh.service` enabled) |
 | **Espacio disponible** | **~30 GB** libres en `/` *(disco total 45 GB; uso prod ~16 GB)* |
 
@@ -279,8 +279,32 @@ Preparación del host OCI como **receptor de backups** desde otros servidores Ea
 |----------|-------|
 | **Propietario** | `backupsrv:backupsrv` en `/backups` |
 | **Modo** | `750` en árbol `/backups` |
-| **`~backupsrv/.ssh`** | Creado (`700`); **sin `authorized_keys` aún** |
-| **Validación** | `sudo -u backupsrv touch /backups/test.txt` — OK |
+| **`~backupsrv/.ssh/authorized_keys`** | **3 claves** ed25519 (una por origen), con `restrict` |
+| **Validación escritura** | `sudo -u backupsrv touch /backups/test.txt` — OK |
+| **Validación SSH** | `ssh -i …/id_ed25519_tamal backupsrv@127.0.0.1` — OK |
+
+### Llaves SSH (jun 2026)
+
+Par dedicado **por servidor origen**. La **pública** está en `backupsrv`; la **privada** queda en OCI para copiar al origen *(no en wiki)*.
+
+| Origen | Comentario clave | Fingerprint (SHA256) | Destino rsync |
+|--------|------------------|----------------------|---------------|
+| **TAMAL** | `backup-tamal@instance-20251115-1442` | `dvIetad3hzt3V9PfSxLblfvF53xz7Hd11klUogjIVy4` | `/backups/tamal/` |
+| **CODITO** | `backup-codito@instance-20251115-1442` | `J5oVpgUtMElbFpyOLkp2GvKBcGA7VQFBxOH3X0u5mA4` | `/backups/codito/` |
+| **Spaguetti** | `backup-spaguetti@instance-20251115-1442` | `9iHnuhMwJXOiGqFbUvE+k60XhjbLTDkDeQETU+2escU` | `/backups/spaguetti/` |
+
+| Ruta en OCI (solo servidor) | Contenido |
+|-----------------------------|-----------|
+| `/home/ubuntu/.ssh/backup-hub/id_ed25519_<origen>` | Clave **privada** — copiar al servidor origen |
+| `/home/ubuntu/.ssh/backup-hub/id_ed25519_<origen>.pub` | Clave pública *(ya instalada en `authorized_keys`)* |
+
+**Restricciones por clave:** `restrict`, sin port-forwarding, X11, agent-forwarding ni PTY.
+
+**Despliegue en origen (pendiente):** en cada servidor (TAMAL / CODITO / Spaguetti), instalar la privada correspondiente (p. ej. `/root/.ssh/id_ed25519_backup_oci`, modo `600`) y probar:
+
+```bash
+ssh -i /root/.ssh/id_ed25519_backup_oci backupsrv@40.233.1.138
+```
 
 ### UFW (sin cambios)
 
@@ -294,7 +318,7 @@ Reglas vigentes al preparar el hub — **no se modificaron**:
 | 4 | 8069/tcp | ALLOW | Anywhere |
 | 5 | 11434/tcp | ALLOW | `95.111.244.137` |
 
-**Pendiente (fuera de alcance):** agregar `authorized_keys` de TAMAL/CODITO/Spaguetti, rsync sobre SSH, cron en origen, y política de retención.
+**Pendiente:** copiar privadas a TAMAL/CODITO/Spaguetti, rsync sobre SSH, cron en origen, y política de retención.
 
 ---
 
