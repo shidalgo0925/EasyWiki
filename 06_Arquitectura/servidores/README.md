@@ -8,8 +8,8 @@ Inventario lógico de **hosts y VPS** usados por Easy Technology Services.
 | # | Nombre lógico | Cliente / uso | Ficha | Estado doc |
 |---|---------------|---------------|-------|------------|
 | 1 | **CODITO** | Relatic Panamá | [[06_Arquitectura/servidores/CODITO]] | **Completa** |
-| 2 | **OCI** | Producción IA / Landing Pages | [[06_Arquitectura/servidores/OCI]] | **Completa** |
-| 3 | **TAMAL** | ERP Odoo (Modecosa y otros) | *(pendiente)* | Por hacer — bloque más grande |
+| 2 | **OCI** | Landing Pages / APIs leads / Ollama auxiliar | [[06_Arquitectura/servidores/OCI]] | **Documentado y Cerrado** |
+| 3 | **TAMAL** | ERP Odoo (Modecosa y otros) | *(pendiente)* | **Siguiente** — bloque más grande |
 | 4 | **Arroz con Pollo** | Laboratorio IA / Easy Wiki / Operator | *(pendiente)* | Por hacer |
 | 5 | **Spaguetti** | IIUS (EN1) | *(pendiente)* | Por hacer |
 | 6 | **GCP histórico** | Retirado | *(pendiente)* | Por hacer |

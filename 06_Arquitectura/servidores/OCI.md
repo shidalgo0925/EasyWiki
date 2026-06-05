@@ -1,7 +1,7 @@
 # OCI — Servidor lógico (Producción IA / Landing Pages)
 
 Documento maestro del host **Oracle Cloud Infrastructure (OCI)** de Easy Technology Services.  
-Actualizado tras inspección en servidor · junio 2026.
+Actualizado tras inspección en servidor · junio 2026 · **revisión de cierre y backup Git**.
 
 ---
 
@@ -72,17 +72,21 @@ Si este servidor dejara de existir mañana: caerían los sitios públicos `bicon
 
 ---
 
-## Notas de arquitectura (relación con CODITO)
+## Notas de arquitectura (relación con otros servidores)
 
-| Elemento | ¿En OCI? | ¿En CODITO (Contabo)? |
-|----------|----------|------------------------|
-| `ai.easynodeone.com` | **No** | **Sí** (mismo VPS `vmi3225509`) |
-| `api-ai.easynodeone.com` | **No** | *Por confirmar en inspección CODITO* |
-| Open WebUI / LiteLLM | **No** | **Sí** *(stack `/opt/ai-stack` en Contabo — no duplicar ficha CODITO)* |
-| EN1 / Relatic | **No** | **Sí** |
-| Ollama `mistral:latest` | **Sí** (`0.0.0.0:11434`) | *No observado en esta ficha* |
+| Elemento | ¿En OCI? | ¿En otro host? |
+|----------|----------|----------------|
+| `ai.easynodeone.com` | **No** | **CODITO** — `vmi3225509` (Contabo) |
+| `api-ai.easynodeone.com` | **No** | **CODITO** *(por confirmar en ficha)* |
+| `appprd.easynodeone.com` | **No** (solo enlace HTML) | **CODITO / Spaguetti** — EN1 prod |
+| Open WebUI / LiteLLM | **No** | **CODITO** — `/opt/ai-stack` |
+| EN1 / Relatic | **No** | **CODITO** |
+| Ollama `mistral:latest` | **Sí** (`0.0.0.0:11434`) | Consumidor autorizado: **`vmi3119011`** (`95.111.244.137`, Contabo) vía UFW |
+| Módulos Odoo (`relatic_integration_dev`, `ets_*`) | **Desarrollo en disco** | Destino deploy: **TAMAL** *(ficha pendiente)* |
+| Easy Wiki (prod) | **No** — clon de trabajo en `/home/ubuntu/EasyWiki` | **CODITO** — `/opt/easynodeone/dev/EasyWiki` |
+| Refrigeración SJ → EN1 webhook | Código listo (`en1WebhookUrl`) | **Inactivo** (`''`) — futuro **CODITO/EN1** |
 
-**CODITO permanece cerrado** (ficha completa). Esta ficha solo enlaza lo que CODITO delegó a OCI y aclara que el metal es **distinto**.
+**CODITO permanece cerrado** (ficha completa). Esta ficha enlaza dependencias sin duplicar contenido de CODITO.
 
 ---
 
@@ -98,6 +102,19 @@ Si este servidor dejara de existir mañana: caerían los sitios públicos `bicon
 | **Arquitectura** | **ARM64** (A1.Flex) |
 | **Shape OCI** | A1.Flex *(inferido por docs internos de migración E5 → A1.Flex)* |
 | **Agente cloud** | `oracle-cloud-agent` (snap), `unified-monitoring-agent` en `/opt` |
+| **Firewall host** | **UFW activo** — ver sección **UFW** |
+
+### UFW (firewall en host)
+
+| Puerto | Acción | Origen | Notas |
+|--------|--------|--------|-------|
+| 22/tcp | ALLOW | Anywhere | SSH |
+| 80/tcp | ALLOW | Anywhere | HTTP → redirect TLS |
+| 443/tcp | ALLOW | Anywhere | HTTPS (Nginx) |
+| 8069/tcp | ALLOW | Anywhere | Legacy `detailing-landing` — **riesgo**; Nginx ya sirve el sitio |
+| 11434/tcp | ALLOW | **`95.111.244.137`** únicamente | Ollama API — host remoto `vmi3119011.contaboserver.net` |
+
+Complementa (no sustituye) las **OCI Security Lists** en consola Oracle.
 
 ---
 
@@ -123,16 +140,22 @@ Renovación: `certbot.timer` / cron estándar Certbot.
 |------------|---------|------------|--------|-------------|-------------|
 | **BI Consulting** | Sitio corporativo + formulario contacto anti-spam | Flask + Gunicorn, reCAPTCHA | **Producción** | EasyTech / cliente BI | `/home/ubuntu/proyectos/BICONsulitng` · `git@github-biconsulting:shidalgo0925/biconsultingpma.git` |
 | **Mustang Basketball Academy** | Landing deportiva | HTML estático (`dist`) | **Producción** | EasyTech / cliente | `/home/ubuntu/MustangBaskAca` · `git@github-mustang:shidalgo0925/Mustang-Bastketball-.git` |
-| **Detailing Service VE** | Landing + reservas (estático) | HTML/CSS/JS | **Producción** | EasyTech / cliente | `/home/ubuntu/DetailingServicesVE` |
-| **AA Transporte** | Landing transporte | HTML estático | **Producción** | EasyTech / cliente | `/home/ubuntu/aa-transporte-landing` |
-| **Refrigeración SJ** | Landing + API leads | HTML + Flask API | **Producción** | EasyTech / cliente | `/home/ubuntu/RefrigeracionSJ` (+ `api/`) |
+| **Detailing Service VE** | Landing + reservas (estático) | HTML/CSS/JS | **Producción** | EasyTech / cliente | `/home/ubuntu/DetailingServicesVE` · `git@github.com:shidalgo0925/DetailingserviceVE.site.git` |
+| **AA Transporte** | Landing transporte | HTML estático | **Producción** | EasyTech / cliente | `/home/ubuntu/aa-transporte-landing` *(repo Git pendiente aprobación)* |
+| **Refrigeración SJ** | Landing + API leads | HTML + Flask API | **Producción** | EasyTech / cliente | `/home/ubuntu/RefrigeracionSJ` (+ `api/`) *(repo Git pendiente aprobación)* |
 | **Ollama** | Inferencia LLM local | Ollama + `mistral:latest` (~4.4 GB) | **Activo** (sin UI web documentada) | EasyTech | systemd `ollama.service` |
 | **relatic_integration_dev** | Módulo Odoo (integración) en desarrollo | Python/Odoo | **No producción** | EasyTech | `/home/ubuntu/proyectos/relatic_integration_dev` |
 | **invoice_import_massive_git** | Utilidad importación facturas | Python | **No producción** *(sin systemd)* | EasyTech | `/home/ubuntu/proyectos/invoice_import_massive_git` |
 | **ets_report_studio / ets_weasy_sale_quote** | Módulos Odoo EasyTech | Python | **No producción** | EasyTech | `/home/ubuntu/ets_*` |
 | **hka_test** | Pruebas facturación HKA | Python | **Laboratorio** | EasyTech | `/home/ubuntu/proyectos/hka_test` |
+| **infomobile** *(legado)* | App móvil (BD huérfana) | PostgreSQL | **Retirado** — sin servicio | EasyTech | BD `infomobile` (`users`, `devices`) |
+| **onepercent** *(legado)* | App TEA / gamificación (BD huérfana) | PostgreSQL | **Retirado** — sin servicio | EasyTech | BD `onepercent_db` |
 
 **Redirect raíz:** `/home/ubuntu/index.html` redirige a `DetailingServicesVE/`.
+
+**Enlace cross-server (Detailing → EN1):** `index.html` referencia `https://appprd.easynodeone.com/profile` (EN1 prod en **CODITO**).
+
+**Histórico retirado en este host:** Odoo y apex `etsrv.site` fueron eliminados del servidor; subdominios `*.etsrv.site` activos apuntan solo a landings actuales. Docs legacy en `/home/ubuntu/docs/documentacion/`.
 
 ---
 
@@ -160,7 +183,8 @@ Renovación: `certbot.timer` / cron estándar Certbot.
 | BD | **PostgreSQL 14** | Local; uso productivo de BDs no confirmado en apps activas |
 | Contenedores | **Docker** | **No instalado / no en uso** |
 | Proceso Node | **PM2** | **No** |
-| Preview HTTP | `python3 -m http.server` | Puertos **8765**, **8780** (`0.0.0.0`) y **8070** (`127.0.0.1`) — servidores manuales sin Nginx; **riesgo de exposición** |
+| Preview HTTP | `python3 -m http.server` | **8765** → `aa-transporte-landing` · **8780** → `RefrigeracionSJ` · **8070** → `DetailingServicesVE` (127.0.0.1) — sin Nginx; **riesgo de exposición** |
+| Firewall | **UFW** | Ver tabla **UFW** en Infraestructura |
 
 ---
 
@@ -174,9 +198,12 @@ Renovación: `certbot.timer` / cron estándar Certbot.
 | **APIs externas** | **Sí** | **Google reCAPTCHA** (BI Consulting); posible relay SMTP del proveedor de correo del cliente |
 | **APIs IA externas** | **No observado** | Sin OpenAI/Anthropic en este host; Ollama es local |
 | **Bases de datos** | **Local** | PostgreSQL `127.0.0.1:5432` — `infomobile`, `onepercent_db` *(sin vínculo claro con apps Nginx activas)* |
-| **CODITO / Contabo** | **Referencia** | Stack IA productivo y EN1 — **dependencia organizacional**, no de red desde landings |
+| **CODITO / Contabo** | **Sí** | Stack IA + EN1; enlace funcional Detailing → `appprd.easynodeone.com` |
+| **TAMAL** | **Sí** (dev) | Módulos Odoo desarrollados en OCI, desplegados en TAMAL |
+| **vmi3119011 (Contabo)** | **Sí** | Único origen UFW permitido para Ollama `:11434` |
 | **Let's Encrypt / Certbot** | **Sí** | TLS en todos los vhosts públicos |
 | **OCI Security Lists** | **Sí** | Puertos 22, 80, 443 documentados en `docs/documentacion/INSTRUCCIONES_SECURITY_LISTS.md` |
+| **UFW (host)** | **Sí** | Reglas locales — ver sección **UFW** |
 
 ---
 
@@ -197,17 +224,30 @@ Renovación: `certbot.timer` / cron estándar Certbot.
 
 ## Tarea 13 – Backups
 
+### Backup en Git (sitios en producción)
+
+| Sitio | Repositorio | Estado Git (jun 2026) |
+|-------|-------------|------------------------|
+| **Detailing Service VE** | `git@github.com:shidalgo0925/DetailingserviceVE.site.git` | **Sincronizado** — commit `622515d` en `main` |
+| **Mustang Basketball Academy** | `git@github-mustang:shidalgo0925/Mustang-Bastketball-.git` | **Sincronizado** con `origin/main` |
+| **BI Consulting** | `git@github-biconsulting:shidalgo0925/biconsultingpma.git` | **Desalineado** — cambios locales sin commit en prod (`app.py`, `index.html`, CSS/JS, etc.) |
+| **AA Transporte** | *Pendiente aprobación* | **Sin Git** — solo disco en servidor |
+| **Refrigeración SJ** | *Pendiente aprobación* | **Sin Git** — solo disco en servidor |
+
+### Otros respaldos
+
 | Campo | Valor |
 |-------|-------|
-| **Existe backup aplicación** | **No documentado** |
-| **Cron backup SQL / archivos** | **No** — `crontab` usuario y root vacíos; sin scripts tipo `backup-*.sh` en rutas de apps |
-| **Backup sistema** | Solo **dpkg/alternatives** en `/var/backups/` (estándar Ubuntu, no restauración de sitios) |
-| **Remota** | **No observada** |
-| **OCI snapshots** | *Por confirmar* en consola OCI (no inspeccionado desde shell) |
-| **Responsable** | **EasyTech** — política de backup **pendiente de definir** |
-| **Certbot** | Renovación automática TLS; no sustituye backup de contenido |
+| **Cron backup SQL / archivos** | **No** — `crontab` usuario y root vacíos |
+| **Backup sistema** | **dpkg/alternatives** en `/var/backups/` + `dpkg-db-backup.timer` |
+| **Remota (Object Storage / S3)** | **No observada** |
+| **OCI snapshots** | *Por confirmar* en consola OCI |
+| **PostgreSQL** (`infomobile`, `onepercent_db`) | **Sin dump automático** |
+| **Ollama** (`mistral:latest`) | **Sin backup** — re-descarga desde registry |
+| **Responsable** | **EasyTech** |
+| **Certbot** | Renovación TLS automática; no sustituye backup de contenido |
 
-**Riesgo:** pérdida del VPS implica pérdida de sitios, BDs locales y modelo Ollama sin restore probado.
+**Riesgo:** AA Transporte y Refrigeración SJ dependen solo del disco del VPS; BI Consulting puede perder cambios no commiteados; BDs legadas y modelo Ollama sin restore probado.
 
 ---
 
@@ -215,7 +255,9 @@ Renovación: `certbot.timer` / cron estándar Certbot.
 
 | Riesgo | Impacto | Mitigación |
 |--------|---------|------------|
-| **Sin backup off-site** de sitios y PostgreSQL | Pérdida total ante fallo de disco o terminación de instancia | Implementar backup diario a Object Storage OCI o S3; probar restore |
+| **Sin backup off-site** de sitios y PostgreSQL | Pérdida total ante fallo de disco o terminación de instancia | Git para landings (3/5 con repo; 2 pendientes); backup BD + Object Storage OCI |
+| **BI Consulting: prod ≠ Git** | Cambios locales sin commit no recuperables | Commit + push del estado actual de producción |
+| **AA Transporte / Refrigeración SJ sin Git** | Pérdida total si cae el VPS | Crear repos tras aprobación; push inicial |
 | **Secretos en systemd drop-in** (`biconsulting.service.d/override.conf`) | Fuga si se expone unidad o wiki | Mover a `EnvironmentFile` con permisos 600; rotar claves SMTP/reCAPTCHA |
 | **Puertos HTTP expuestos** (8069, 8765, 8780, 11434) sin Nginx | Superficie de ataque; bypass de TLS | Cerrar en Security Lists / firewall; bind `127.0.0.1`; deshabilitar servicios legacy |
 | **`detailing-landing.service` con ruta inválida** | Servicio zombie / confusión operativa | Corregir `WorkingDirectory` o deshabilitar unidad (Nginx ya sirve el sitio) |
@@ -229,13 +271,25 @@ Renovación: `certbot.timer` / cron estándar Certbot.
 
 ## Próximos pasos
 
-1. **Alinear nomenclatura** en README wiki: OCI = Producción landings + Ollama auxiliar; IA productiva = CODITO.
-2. **Implementar backups** (contenido `/home/ubuntu/*` landings + dump PostgreSQL) hacia almacenamiento remoto OCI.
-3. **Cerrar puertos** innecesarios (8069, 8765, 8780, 11434 público) o restringir a VCN / túnel.
-4. **Migrar secretos** de systemd override a archivos `EnvironmentFile` fuera de wiki/git.
-5. **Revisar** unidad `detailing-landing.service` (ruta inexistente).
-6. **Documentar TAMAL** (siguiente en cola según CODITO) antes de Marketing Hub / Easy Operator.
-7. **No copiar** `backend/docs` de EN1 ni duplicar contenido de CODITO.
+1. **Commit + push** estado prod de BI Consulting a `biconsultingpma.git`.
+2. **Crear repos Git** para AA Transporte y Refrigeración SJ tras aprobación.
+3. **Implementar backups** BD (`infomobile`, `onepercent_db`) y dumps hacia Object Storage OCI.
+4. **Cerrar puertos** innecesarios (8069 mundo, 8765/8780) y revisar UFW Ollama (`11434`).
+5. **Migrar secretos** de systemd override a `EnvironmentFile` con permisos 600.
+6. **Deshabilitar** `detailing-landing.service` (zombie; Nginx ya sirve el sitio).
+7. **Documentar TAMAL** (siguiente en cola) antes de Marketing Hub / Easy Operator.
+
+---
+
+## Cierre documental
+
+| Campo | Valor |
+|-------|-------|
+| **Estado ficha** | **Documentado y Cerrado** |
+| **Alcance** | Auditoría infraestructura Fase 2 — hechos observados, sin secretos |
+| **Fecha cierre** | Junio 2026 |
+| **Vacíos aceptados** | OCI snapshots en consola (*por confirmar*); repos Git AA Transporte / Refrigeración SJ (*pendiente aprobación*) |
+| **Siguiente servidor** | **TAMAL** |
 
 ---
 
@@ -268,7 +322,11 @@ Renovación: `certbot.timer` / cron estándar Certbot.
 | Clasificación (Tarea 14) | ✅ |
 | Riesgos | ✅ |
 | Próximos pasos | ✅ |
+| UFW / firewall host | ✅ |
+| Backup Git por sitio | ✅ |
+| Dependencias cross-server | ✅ |
+| Cierre documental | ✅ |
 
 ---
 
-**Índice servidores:** [[06_Arquitectura/servidores/README]] · **CODITO (IA productiva / EN1):** [[06_Arquitectura/servidores/CODITO]]
+**Índice servidores:** [[06_Arquitectura/servidores/README]] · **CODITO (IA productiva / EN1):** [[06_Arquitectura/servidores/CODITO]] · **Siguiente:** TAMAL
