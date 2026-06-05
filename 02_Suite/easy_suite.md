@@ -19,6 +19,8 @@ Un cliente puede empezar con **un módulo** (eventos, tienda, campus) y crecer h
 
 Mapa visual: [[02_Suite/mapa_suite]].
 
+**Arquitectura funcional** (qué es EN1, Apps EN1, dependencias, madurez): [[01_Arquitectura_Producto/easy_suite_architecture]].
+
 **Inventario en servidor CODITO** (productos desplegados, rutas, Git, dominios): [[02_Suite/inventario_easy_suite]].
 
 ## Naming
