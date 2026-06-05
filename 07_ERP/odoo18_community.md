@@ -90,21 +90,30 @@ MuK Backend Theme desplegado en todas las bases activas:
 
 ---
 
-## Backup PostgreSQL — inventario Fase 2.5
+## Backup PostgreSQL — Fase 3 (script manual)
 
 | Campo | Valor |
 |---|---|
-| **Estado** | **Inventario completo validado** — 2026-06-05 |
+| **Estado** | **Script validado** — 2026-06-05 |
+| **Script** | `/usr/local/bin/backup_postgresql_tamal.sh` |
+| **Ejecución** | `sudo /usr/local/bin/backup_postgresql_tamal.sh` |
 | **Formato** | `pg_dump -Fc` (PostgreSQL 16.14) |
-| **Local TAMAL** | `/backups/tamal/db/` |
-| **Remoto OCI** | `backupsrv@40.233.1.138:/backups/tamal/` |
-| **Total 6 bases prod.** | **~74 MB** (77 285 064 bytes) |
-| **Integridad** | `pg_restore --list` OK en **todas** las bases |
-| **Transferencia OCI** | **Validada** vía `scp` (todas las bases) |
+| **Local TAMAL** | `/backups/tamal/db/YYYY-MM-DD/` |
+| **Remoto OCI** | `backupsrv@40.233.1.138:/backups/tamal/YYYY-MM-DD/` |
+| **Log** | `/backups/tamal/logs/backup_postgresql_tamal_YYYY-MM-DD.log` |
+| **Total 6 bases prod.** | **~74 MB** por ejecución |
+| **Integridad** | `pg_restore --list` antes de cada transferencia |
+| **Primera corrida** | 6/6 OK — 2026-06-05 06:21 CEST |
 | **Restauración completa** | **Pendiente Fase 5** |
-| **Automatización** | **No** — script Fase 3 / cron Fase 4 pendientes |
+| **Cron** | **No** — Fase 4 pendiente |
 
-### Tamaño dump por base
+### Bases incluidas
+
+Easydb · lahuaca · SMRC · Sanadb · TTTourism · relatic — excluida `odoo18`.
+
+Procedimiento completo: [[06_Arquitectura/servidores/TAMAL#Backup Hub OCI — Fase 3 (script manual)]].
+
+### Tamaño dump por base (referencia Fase 2.5)
 
 | Base | Cliente | Tamaño dump | Restauración validada |
 |---|---|---:|---|

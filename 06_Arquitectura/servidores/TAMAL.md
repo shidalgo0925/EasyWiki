@@ -7,7 +7,7 @@
 | **Proveedor** | Contabo (AS40021) |
 | **Rol** | Servidor ERP principal multi-tenant Odoo 18 Community |
 | **Estado inspección** | 2026-06-04 — DOCUMENTADO |
-| **Backup Hub OCI** | Fase 1 ✅ · Fase 2 ✅ · **Fase 2.5 inventario** ✅ — 2026-06-05 |
+| **Backup Hub OCI** | Fase 1 ✅ · Fase 2 ✅ · Fase 2.5 ✅ · **Fase 3 script** ✅ — 2026-06-05 |
 | **Restricción aplicada** | Solo lectura; sin reinicios ni cambios |
 
 ---
@@ -160,7 +160,7 @@ Copia desarrollo FE: `/home/admin/FE_HKA_OCI/` (versión más nueva que producci
 
 | Tipo | Estado | Frecuencia | Destino | Observaciones |
 |---|---|---|---|---|
-| **Bases de datos PostgreSQL** | Manual validado (Fase 2/2.5) | Bajo demanda | TAMAL `/backups/tamal/db/` + OCI `/backups/tamal/` (~74 MB) | **Sin cron** — inventario completo 2026-06-05; restauración real pendiente Fase 5 |
+| **Bases de datos PostgreSQL** | Script manual Fase 3 | Bajo demanda | TAMAL `/backups/tamal/db/YYYY-MM-DD/` + OCI `/backups/tamal/YYYY-MM-DD/` | **Sin cron** — script `/usr/local/bin/backup_postgresql_tamal.sh`; restauración real pendiente Fase 5 |
 | **Código custom addons** | Manual | Único hallado: 2025-10-20 | `/home/admin/odoo18_custom_modules_20251020_021812.tar.gz` (79 MB) | Desactualizado (>7 meses) |
 | **FE_HKA_OCI** | Git | Bajo demanda | GitHub `shidalgo0925/FE_HKA_OCI` | Backup local adicional `FE_HKA_OCI_backup_20260306` |
 | **Filestore Odoo** | Sin backup dedicado | — | `/var/lib/odoo/filestore` (283 MB) | Incluye adjuntos de todas las BD |
@@ -442,18 +442,82 @@ Mismos archivos en `backupsrv@40.233.1.138:/backups/tamal/`.
 | Tamaños coinciden TAMAL = OCI | ✅ |
 | Tabla inventario documentada | ✅ |
 | Restauración completa probada | ❌ Pendiente **Fase 5** |
-| Script `backup_postgresql_tamal.sh` | ❌ Pendiente **Fase 3** |
+| Script `backup_postgresql_tamal.sh` | ✅ **Fase 3** |
 | Cron 02:00 / 03:00 / 04:00 | ❌ Pendiente **Fase 4** |
 
-### Roadmap backup TAMAL (aprobado, no implementado)
+### Roadmap backup TAMAL
 
 | Fase | Alcance | Estado |
 |---|---|---|
 | **2** | Demo manual Easydb | ✅ |
 | **2.5** | Inventario tamaños todas las bases prod. | ✅ |
-| **3** | Script `backup_postgresql_tamal.sh` (6 bases → `YYYY-MM-DD.dump`) | Pendiente |
+| **3** | Script `backup_postgresql_tamal.sh` (6 bases → carpeta `YYYY-MM-DD/`) | ✅ |
 | **4** | Automatización: 02:00 dump · 03:00 scp OCI · 04:00 verificación | Pendiente |
 | **5** | **Prueba restauración real** — backup no existe hasta validar recover | Pendiente |
+
+---
+
+## Backup Hub OCI — Fase 3 (script manual)
+
+**Objetivo:** unificar dump + validación + transferencia OCI en un script ejecutable manualmente. **Sin cron.**
+
+### Script
+
+| Campo | Valor |
+|---|---|
+| **Ruta** | `/usr/local/bin/backup_postgresql_tamal.sh` |
+| **Ejecución** | `sudo /usr/local/bin/backup_postgresql_tamal.sh` |
+| **Usuario** | **root** (requerido: clave SSH, paths backup) |
+| **Bases incluidas** | Easydb, lahuaca, SMRC, Sanadb, TTTourism, relatic |
+| **Excluida** | `odoo18` (laboratorio) |
+| **Formato dump** | `pg_dump -Fc` |
+| **Validación** | `pg_restore --list` antes de cada `scp` |
+| **Transferencia** | `scp` (no rsync) |
+| **Fallo por base** | Registra error, continúa con las demás |
+| **Retención** | No elimina dumps anteriores |
+
+### Rutas
+
+| Destino | Ruta |
+|---|---|
+| Dumps locales | `/backups/tamal/db/YYYY-MM-DD/{Base}.dump` |
+| Log | `/backups/tamal/logs/backup_postgresql_tamal_YYYY-MM-DD.log` |
+| OCI | `backupsrv@40.233.1.138:/backups/tamal/YYYY-MM-DD/` |
+| Clave SSH | `/root/.ssh/id_ed25519_backup_oci` |
+
+### Flujo del script
+
+1. Crear carpeta diaria local y remota (OCI).
+2. Por cada base: `pg_dump -Fc` → validar `pg_restore --list` → `scp` a OCI.
+3. Registrar tamaño, TOC entries y resultado por base.
+4. Resumen final en log y stdout.
+5. Exit code `0` si todas OK; `1` si alguna falló.
+
+### Primera ejecución validada (2026-06-05)
+
+| Campo | Valor |
+|---|---|
+| **Inicio** | 06:21:10 CEST |
+| **Duración** | ~33 s |
+| **Resultado** | **6/6 OK** — 0 fallos |
+| **Tamaño total** | 74 MiB (77 285 064 bytes) |
+| **Local** | `/backups/tamal/db/2026-06-05/` (6 archivos `.dump`) |
+| **OCI** | `/backups/tamal/2026-06-05/` (6 archivos `.dump`) |
+| **Log** | `/backups/tamal/logs/backup_postgresql_tamal_2026-06-05.log` |
+| **Dumps Fase 2/2.5** | **Preservados** en `/backups/tamal/db/*.dump` y `/backups/tamal/*.dump` (OCI raíz) |
+
+### Checklist Fase 3
+
+| Paso | Estado |
+|---|---|
+| Script en `/usr/local/bin/backup_postgresql_tamal.sh` | ✅ |
+| Ejecución manual 6 bases | ✅ |
+| `pg_restore --list` antes de scp | ✅ |
+| Transferencia OCI en subcarpeta diaria | ✅ |
+| Log generado | ✅ |
+| Dumps anteriores no borrados | ✅ |
+| Cron / systemd timer | ❌ No creado (deliberado) |
+| Odoo / PostgreSQL sin cambios | ✅ |
 
 ---
 
