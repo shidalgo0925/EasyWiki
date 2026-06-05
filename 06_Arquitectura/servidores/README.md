@@ -8,7 +8,7 @@ Inventario lógico de **hosts y VPS** usados por Easy Technology Services.
 | # | Nombre lógico | Cliente / uso | Ficha | Estado doc |
 |---|---------------|---------------|-------|------------|
 | 1 | **CODITO** | Relatic Panamá | [[06_Arquitectura/servidores/CODITO]] | **Completa** |
-| 2 | **OCI** | Producción IA | *(pendiente)* | Por hacer |
+| 2 | **OCI** | Producción IA / Landing Pages | [[06_Arquitectura/servidores/OCI]] | **Completa** |
 | 3 | **TAMAL** | ERP Odoo (Modecosa y otros) | *(pendiente)* | Por hacer — bloque más grande |
 | 4 | **Arroz con Pollo** | Laboratorio IA / Easy Wiki / Operator | *(pendiente)* | Por hacer |
 | 5 | **Spaguetti** | IIUS (EN1) | *(pendiente)* | Por hacer |
@@ -19,7 +19,7 @@ Inventario lógico de **hosts y VPS** usados por Easy Technology Services.
 | Nombre lógico | Categoría | Notas |
 |---------------|-----------|-------|
 | **CODITO** | **Producción** | Cliente Relatic Panamá (silo `relatic`); mismo VPS aloja silos EasyTech |
-| **OCI** | **Producción** | IA en producción |
+| **OCI** | **Producción** | Landing pages + APIs leads + Ollama local; stack IA productivo en CODITO (Contabo) |
 | **TAMAL** | **Producción** | Odoo 18 Community / 19 Enterprise, FE, módulos EasyTech |
 | **Arroz con Pollo** | **Laboratorio** / IA | Wiki, Operator, experimentos |
 | **Spaguetti** | **Producción** | Instancia EN1 IIUS |
