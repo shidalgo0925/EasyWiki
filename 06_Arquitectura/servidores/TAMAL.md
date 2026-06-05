@@ -7,7 +7,7 @@
 | **Proveedor** | Contabo (AS40021) |
 | **Rol** | Servidor ERP principal multi-tenant Odoo 18 Community |
 | **Estado inspección** | 2026-06-04 — DOCUMENTADO |
-| **Backup Hub OCI** | Fase 1 ✅ · Fase 2 (PG manual) ✅ — 2026-06-05 |
+| **Backup Hub OCI** | Fase 1 ✅ · Fase 2 ✅ · **Fase 2.5 inventario** ✅ — 2026-06-05 |
 | **Restricción aplicada** | Solo lectura; sin reinicios ni cambios |
 
 ---
@@ -160,7 +160,7 @@ Copia desarrollo FE: `/home/admin/FE_HKA_OCI/` (versión más nueva que producci
 
 | Tipo | Estado | Frecuencia | Destino | Observaciones |
 |---|---|---|---|---|
-| **Bases de datos PostgreSQL** | **NO automatizado** | — | — | **Riesgo crítico** — sin cron `pg_dump` detectado |
+| **Bases de datos PostgreSQL** | Manual validado (Fase 2/2.5) | Bajo demanda | TAMAL `/backups/tamal/db/` + OCI `/backups/tamal/` (~74 MB) | **Sin cron** — inventario completo 2026-06-05; restauración real pendiente Fase 5 |
 | **Código custom addons** | Manual | Único hallado: 2025-10-20 | `/home/admin/odoo18_custom_modules_20251020_021812.tar.gz` (79 MB) | Desactualizado (>7 meses) |
 | **FE_HKA_OCI** | Git | Bajo demanda | GitHub `shidalgo0925/FE_HKA_OCI` | Backup local adicional `FE_HKA_OCI_backup_20260306` |
 | **Filestore Odoo** | Sin backup dedicado | — | `/var/lib/odoo/filestore` (283 MB) | Incluye adjuntos de todas las BD |
@@ -350,8 +350,6 @@ Para backups con `rsync`, instalar `rsync` en OCI accesible para `backupsrv`, o 
 | **Integridad** | `pg_restore --list` — **OK** (11 524 líneas, sin errores) |
 | **Transferencia** | `scp` vía `/root/.ssh/id_ed25519_backup_oci` → `backupsrv@40.233.1.138:/backups/tamal/` |
 
-**Bases excluidas en Fase 2** (hasta repetir procedimiento): `lahuaca`, `SMRC`, `TTTourism`, `Sanadb`, `relatic`, `odoo18`.
-
 ### Procedimiento manual (referencia)
 
 ```bash
@@ -383,6 +381,79 @@ ssh -i /root/.ssh/id_ed25519_backup_oci -o IdentitiesOnly=yes \
 | Transferencia scp → OCI | ✅ |
 | Dump visible en OCI (tamaño coincide) | ✅ |
 | Cron / automatización | ❌ No creado (deliberado) |
+
+---
+
+## Backup Hub OCI — Fase 2.5 (inventario de recuperación)
+
+**Objetivo:** medir tamaño real de dump por cliente, validar integridad (`pg_restore --list`) y transferir a OCI. **Sin cron, sin script, sin restauración completa** (eso es Fase 5).
+
+**Fecha inventario:** 2026-06-05  
+**Formato:** `pg_dump -Fc` · PostgreSQL 16.14  
+**Destino OCI:** `/backups/tamal/` (74 MB total en hub)
+
+### Tabla inventario — bases producción
+
+| Base | Cliente | Tamaño dump | Bytes | TOC entries | `pg_restore --list` | En OCI |
+|---|---|---:|---:|---:|---|---|
+| **Easydb** | Easy Technology Services | 9.7 MB | 10 155 332 | 11 524 | ✅ Sí | ✅ |
+| **lahuaca** | La Huaca | 16 MB | 16 674 962 | 13 342 | ✅ Sí | ✅ |
+| **SMRC** | Servicios Múltiples RC | 13 MB | 12 773 841 | 10 886 | ✅ Sí | ✅ |
+| **Sanadb** | SANAGUA LODGE | 9.5 MB | 9 899 244 | 11 122 | ✅ Sí | ✅ |
+| **TTTourism** | T & T Tourism Plus | 9.7 MB | 10 079 648 | 11 353 | ✅ Sí | ✅ |
+| **relatic** | Relatic / Multiservicios TK | 17 MB | 17 702 037 | 13 336 | ✅ Sí | ✅ |
+| **TOTAL (6 bases prod.)** | — | **~74 MB** | **77 285 064** | — | — | ✅ |
+
+**Excluida deliberadamente:** `odoo18` (laboratorio/demo).
+
+### Hallazgos clave
+
+| Métrica | Valor | Implicación |
+|---|---|---|
+| **Total dumps producción** | ~74 MB / día | OCI: espacio mínimo; retención 30 días ≈ 2.2 GB |
+| **Mayor dump** | relatic (17 MB) | No es La Huaca — a pesar de 5 637 facturas, `lahuaca` comprime a 16 MB |
+| **Menor dump** | Sanadb (9.5 MB) | Clientes similares en rango 9–10 MB |
+| **Tiempo dump 6 BD** | ~21 s | Carga baja en TAMAL |
+| **Tiempo transferencia scp** | ~11 s | Ancho de banda suficiente para Fase 4 nocturna |
+| **BD vs dump** | lahuaca 121 MB → 16 MB dump | Ratio compresión ~7.5× (custom format `-Fc`) |
+
+**Conclusión:** el volumen ERP de EasyTech en TAMAL es **moderado**. Una política de retención diaria + 30/90 días en OCI es viable sin costo de almacenamiento significativo. La Huaca **no** requiere estrategia especial por tamaño (sí por criticidad de negocio).
+
+### Archivos en TAMAL y OCI (2026-06-05)
+
+```text
+/backups/tamal/db/Easydb_2026-06-05.dump      9.7 MB
+/backups/tamal/db/lahuaca_2026-06-05.dump     16 MB
+/backups/tamal/db/SMRC_2026-06-05.dump        13 MB
+/backups/tamal/db/Sanadb_2026-06-05.dump     9.5 MB
+/backups/tamal/db/TTTourism_2026-06-05.dump  9.7 MB
+/backups/tamal/db/relatic_2026-06-05.dump     17 MB
+```
+
+Mismos archivos en `backupsrv@40.233.1.138:/backups/tamal/`.
+
+### Checklist Fase 2.5
+
+| Paso | Estado |
+|---|---|
+| Dump las 6 bases producción | ✅ |
+| `pg_restore --list` sin errores (todas) | ✅ |
+| Transferencia scp → OCI (todas) | ✅ |
+| Tamaños coinciden TAMAL = OCI | ✅ |
+| Tabla inventario documentada | ✅ |
+| Restauración completa probada | ❌ Pendiente **Fase 5** |
+| Script `backup_postgresql_tamal.sh` | ❌ Pendiente **Fase 3** |
+| Cron 02:00 / 03:00 / 04:00 | ❌ Pendiente **Fase 4** |
+
+### Roadmap backup TAMAL (aprobado, no implementado)
+
+| Fase | Alcance | Estado |
+|---|---|---|
+| **2** | Demo manual Easydb | ✅ |
+| **2.5** | Inventario tamaños todas las bases prod. | ✅ |
+| **3** | Script `backup_postgresql_tamal.sh` (6 bases → `YYYY-MM-DD.dump`) | Pendiente |
+| **4** | Automatización: 02:00 dump · 03:00 scp OCI · 04:00 verificación | Pendiente |
+| **5** | **Prueba restauración real** — backup no existe hasta validar recover | Pendiente |
 
 ---
 

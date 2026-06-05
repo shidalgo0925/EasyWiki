@@ -90,24 +90,33 @@ MuK Backend Theme desplegado en todas las bases activas:
 
 ---
 
-## Backup PostgreSQL (manual — Fase 2)
+## Backup PostgreSQL — inventario Fase 2.5
 
 | Campo | Valor |
 |---|---|
-| **Estado** | **Validado manualmente** — 2026-06-05 |
-| **Base de prueba** | `Easydb` |
-| **Archivo** | `Easydb_2026-06-05.dump` |
-| **Tamaño** | 9.7 MB |
+| **Estado** | **Inventario completo validado** — 2026-06-05 |
 | **Formato** | `pg_dump -Fc` (PostgreSQL 16.14) |
 | **Local TAMAL** | `/backups/tamal/db/` |
 | **Remoto OCI** | `backupsrv@40.233.1.138:/backups/tamal/` |
-| **Integridad** | `pg_restore --list` OK — 11 513 TOC entries |
-| **Transferencia OCI** | **Validada** vía `scp` + clave `id_ed25519_backup_oci` |
-| **Automatización** | **No** — sin cron (Fase 2 solo demostración) |
+| **Total 6 bases prod.** | **~74 MB** (77 285 064 bytes) |
+| **Integridad** | `pg_restore --list` OK en **todas** las bases |
+| **Transferencia OCI** | **Validada** vía `scp` (todas las bases) |
+| **Restauración completa** | **Pendiente Fase 5** |
+| **Automatización** | **No** — script Fase 3 / cron Fase 4 pendientes |
 
-Procedimiento completo: [[06_Arquitectura/servidores/TAMAL#Backup Hub OCI — Fase 2 (PostgreSQL manual)]].
+### Tamaño dump por base
 
-**Pendiente Fase 3+:** replicar para `lahuaca`, `SMRC`, `TTTourism` y resto de bases; luego cron/script.
+| Base | Cliente | Tamaño dump | Restauración validada |
+|---|---|---:|---|
+| Easydb | Easy Technology Services | 9.7 MB | ✅ `--list` (Fase 2) |
+| lahuaca | La Huaca | 16 MB | ✅ `--list` |
+| SMRC | Servicios Múltiples RC | 13 MB | ✅ `--list` |
+| Sanadb | SANAGUA LODGE | 9.5 MB | ✅ `--list` |
+| TTTourism | T & T Tourism Plus | 9.7 MB | ✅ `--list` |
+| relatic | Relatic / Multiservicios TK | 17 MB | ✅ `--list` |
+| **TOTAL** | — | **~74 MB** | `--list` sí · restore real **no** |
+
+Procedimiento e implicaciones de política: [[06_Arquitectura/servidores/TAMAL#Backup Hub OCI — Fase 2.5 (inventario de recuperación)]].
 
 ---
 
