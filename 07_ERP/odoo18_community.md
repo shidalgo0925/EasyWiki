@@ -104,8 +104,8 @@ MuK Backend Theme desplegado en todas las bases activas:
 | **Total 6 bases prod.** | **~74 MB** por ejecución |
 | **Integridad** | `pg_restore --list` antes de cada transferencia |
 | **Primera corrida** | 6/6 OK — 2026-06-05 06:21 CEST |
-| **Restauración completa** | ✅ **Fase 5** — Easydb restore OK (2026-06-05) |
-| **Cron** | **No** — Fase 4 pendiente |
+| **Restauración completa** | ✅ **Fase 5** — Easydb + **lahuaca** (2026-06-05) |
+| **Cron** | **Autorizado Fase 4** — pendiente implementar |
 
 ### Bases incluidas
 
@@ -118,12 +118,12 @@ Procedimiento completo: [[06_Arquitectura/servidores/TAMAL#Backup Hub OCI — Fa
 | Base | Cliente | Tamaño dump | Restauración validada |
 |---|---|---:|---|
 | Easydb | Easy Technology Services | 9.7 MB | ✅ **restore real** (Fase 5) |
-| lahuaca | La Huaca | 16 MB | ✅ `--list` |
+| lahuaca | La Huaca | 16 MB | ✅ **restore real** (Fase 5) |
 | SMRC | Servicios Múltiples RC | 13 MB | ✅ `--list` |
 | Sanadb | SANAGUA LODGE | 9.5 MB | ✅ `--list` |
 | TTTourism | T & T Tourism Plus | 9.7 MB | ✅ `--list` |
 | relatic | Relatic / Multiservicios TK | 17 MB | ✅ `--list` |
-| **TOTAL** | — | **~74 MB** | Easydb restore real ✅ · resto `--list` |
+| **TOTAL** | — | **~74 MB** | Easydb + lahuaca restore real ✅ |
 
 Procedimiento restore: [[06_Arquitectura/servidores/TAMAL#Backup Hub OCI — Fase 5 (restauración real)]].
 
