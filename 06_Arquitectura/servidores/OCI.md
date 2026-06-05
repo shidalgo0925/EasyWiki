@@ -96,7 +96,8 @@ Si este servidor dejara de existir mañana: caerían los sitios públicos `bicon
 |---------|-----------------|
 | **CPU** | 4 vCPU (`aarch64`) |
 | **RAM** | 23 GiB (~22 GiB disponibles en inspección) |
-| **Disco** | 45 GB (`/dev/sda1`), ~34 % uso |
+| **Disco** | 45 GB (`/dev/sda1`), ~34 % uso · **~30 GB libres** (jun 2026) |
+| **Espacio reservado backups** | **~25–30 GB** disponibles bajo `/backups` *(sin cuota dura; prod ~16 GB en uso)* |
 | **Swap** | 0 B (sin swap configurado) |
 | **Sistema operativo** | Ubuntu 22.04.5 LTS (Jammy), kernel `6.8.0-1047-oracle` |
 | **Arquitectura** | **ARM64** (A1.Flex) |
@@ -251,6 +252,52 @@ Renovación: `certbot.timer` / cron estándar Certbot.
 
 ---
 
+## Backup Hub
+
+Preparación del host OCI como **receptor de backups** desde otros servidores EasyTech (TAMAL, CODITO, Spaguetti). **Sin rsync, cron ni llaves SSH configuradas aún** — solo infraestructura base (jun 2026).
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | **Preparado** |
+| **Usuario** | `backupsrv` *(sin sudo)* |
+| **Estado SSH** | **Activo** — puerto **22/tcp** (`ssh.service` enabled) |
+| **Espacio disponible** | **~30 GB** libres en `/` *(disco total 45 GB; uso prod ~16 GB)* |
+
+### Directorios
+
+| Ruta | Origen previsto |
+|------|-----------------|
+| `/backups/tamal` | TAMAL |
+| `/backups/codito` | CODITO (Contabo) |
+| `/backups/spaguetti` | Spaguetti |
+| `/backups/manual` | Copias manuales / ad-hoc |
+| `/backups/logs` | Registro de transferencias *(futuro)* |
+
+### Permisos y acceso SSH
+
+| Elemento | Valor |
+|----------|-------|
+| **Propietario** | `backupsrv:backupsrv` en `/backups` |
+| **Modo** | `750` en árbol `/backups` |
+| **`~backupsrv/.ssh`** | Creado (`700`); **sin `authorized_keys` aún** |
+| **Validación** | `sudo -u backupsrv touch /backups/test.txt` — OK |
+
+### UFW (sin cambios)
+
+Reglas vigentes al preparar el hub — **no se modificaron**:
+
+| # | Puerto | Acción | Origen |
+|---|--------|--------|--------|
+| 1 | 22/tcp | ALLOW | Anywhere |
+| 2 | 80/tcp | ALLOW | Anywhere |
+| 3 | 443/tcp | ALLOW | Anywhere |
+| 4 | 8069/tcp | ALLOW | Anywhere |
+| 5 | 11434/tcp | ALLOW | `95.111.244.137` |
+
+**Pendiente (fuera de alcance):** agregar `authorized_keys` de TAMAL/CODITO/Spaguetti, rsync sobre SSH, cron en origen, y política de retención.
+
+---
+
 ## Riesgos
 
 | Riesgo | Impacto | Mitigación |
@@ -324,6 +371,7 @@ Renovación: `certbot.timer` / cron estándar Certbot.
 | Próximos pasos | ✅ |
 | UFW / firewall host | ✅ |
 | Backup Git por sitio | ✅ |
+| Backup Hub (preparación) | ✅ |
 | Dependencias cross-server | ✅ |
 | Cierre documental | ✅ |
 
