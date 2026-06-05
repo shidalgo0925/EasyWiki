@@ -7,7 +7,7 @@
 | **Proveedor** | Contabo (AS40021) |
 | **Rol** | Servidor ERP principal multi-tenant Odoo 18 Community |
 | **Estado inspección** | 2026-06-04 — DOCUMENTADO |
-| **Backup Hub OCI** | Fases 1–3 ✅ · Fase 5 restore ✅ (Easydb + **La Huaca**) — 2026-06-05 |
+| **Backup Hub OCI** | Fases 1–5 ✅ · **Fase 4 cron activo** — 2026-06-05 |
 | **Restricción aplicada** | Solo lectura; sin reinicios ni cambios |
 
 ---
@@ -160,7 +160,7 @@ Copia desarrollo FE: `/home/admin/FE_HKA_OCI/` (versión más nueva que producci
 
 | Tipo | Estado | Frecuencia | Destino | Observaciones |
 |---|---|---|---|---|
-| **Bases de datos PostgreSQL** | Script Fase 3 + **restore Fase 5** (Easydb + lahuaca) | Bajo demanda | TAMAL + OCI | **Sin cron** — backup **recuperable**; **Fase 4 autorizada** |
+| **Bases de datos PostgreSQL** | **Cron diario Fase 4** + script manual | 02:00 backup · 04:00 verify | TAMAL + OCI | Restore validado Easydb + lahuaca |
 | **Código custom addons** | Manual | Único hallado: 2025-10-20 | `/home/admin/odoo18_custom_modules_20251020_021812.tar.gz` (79 MB) | Desactualizado (>7 meses) |
 | **FE_HKA_OCI** | Git | Bajo demanda | GitHub `shidalgo0925/FE_HKA_OCI` | Backup local adicional `FE_HKA_OCI_backup_20260306` |
 | **Filestore Odoo** | Sin backup dedicado | — | `/var/lib/odoo/filestore` (283 MB) | Incluye adjuntos de todas las BD |
@@ -443,7 +443,7 @@ Mismos archivos en `backupsrv@40.233.1.138:/backups/tamal/`.
 | Tabla inventario documentada | ✅ |
 | Restauración completa probada | ✅ **Fase 5** (Easydb + lahuaca) |
 | Script `backup_postgresql_tamal.sh` | ✅ **Fase 3** |
-| Cron 02:00 / 03:00 / 04:00 | **Autorizado Fase 4** — pendiente implementar |
+| Cron 02:00 backup · 04:00 verify | ✅ **Fase 4 activo** |
 
 ### Roadmap backup TAMAL
 
@@ -452,7 +452,7 @@ Mismos archivos en `backupsrv@40.233.1.138:/backups/tamal/`.
 | **2** | Demo manual Easydb | ✅ |
 | **2.5** | Inventario tamaños todas las bases prod. | ✅ |
 | **3** | Script `backup_postgresql_tamal.sh` (6 bases → carpeta `YYYY-MM-DD/`) | ✅ |
-| **4** | Automatización: 02:00 dump · 03:00 scp OCI · 04:00 verificación | **Autorizada** — pendiente implementar |
+| **4** | Automatización: 02:00 backup+scp · 04:00 verificación OCI | ✅ **Activo** |
 | **5** | **Prueba restauración real** — backup no existe hasta validar recover | ✅ Easydb + **lahuaca** |
 
 ---
@@ -516,7 +516,7 @@ Mismos archivos en `backupsrv@40.233.1.138:/backups/tamal/`.
 | Transferencia OCI en subcarpeta diaria | ✅ |
 | Log generado | ✅ |
 | Dumps anteriores no borrados | ✅ |
-| Cron / systemd timer | ❌ No creado (deliberado) |
+| Cron / systemd timer | ✅ Fase 4 (`/etc/cron.d/backup-postgresql-tamal`) |
 | Odoo / PostgreSQL sin cambios | ✅ |
 
 ---
@@ -570,6 +570,8 @@ Log: `/backups/tamal/logs/restore_easydb_test_2026-06-05.log`
 
 Log: `/backups/tamal/logs/restore_lahuaca_test_2026-06-05.log`
 
+**Re-ejecución confirmatoria (2026-06-05 06:32 CEST):** exit 0 · 41 s · 5 968 facturas · base temporal eliminada. **Aprobación cron Fase 4.**
+
 ### Restricciones respetadas (ambas pruebas)
 
 - ❌ No se tocó ninguna base productiva (escritura)
@@ -589,7 +591,50 @@ Log: `/backups/tamal/logs/restore_lahuaca_test_2026-06-05.log`
 
 ### Conclusión
 
-Pipeline **export → OCI → restore** validado en **Easydb** (control) y **lahuaca** (cliente crítico). **Fase 4 (cron diario) autorizada** para implementación. Resto de bases prod. con `--list` OK; restore puntual opcional.
+Pipeline **export → OCI → restore** validado en **Easydb** y **lahuaca**. **Fase 4 cron diario activo** desde 2026-06-05.
+
+---
+
+## Backup Hub OCI — Fase 4 (cron diario)
+
+**Activado:** 2026-06-05 — tras restore La Huaca OK (re-ejecución 06:32 CEST).
+
+### Cron
+
+| Archivo | `/etc/cron.d/backup-postgresql-tamal` |
+|---|---|
+| **02:00** | `/usr/local/bin/backup_postgresql_tamal.sh` — dump + `pg_restore --list` + scp OCI |
+| **04:00** | `/usr/local/bin/verify_backup_postgresql_tamal.sh` — compara tamaños local vs OCI (6 bases) |
+
+**Nota:** dump y transferencia scp ocurren en la misma corrida 02:00 (~33 s total al 2026-06-05). No hay job separado 03:00.
+
+### Scripts
+
+| Script | Función |
+|---|---|
+| `backup_postgresql_tamal.sh` | Backup completo 6 bases → `/backups/tamal/db/YYYY-MM-DD/` + OCI |
+| `verify_backup_postgresql_tamal.sh` | Verificación post-backup: 6/6 tamaños local = remoto |
+
+### Logs
+
+| Log | Ruta |
+|---|---|
+| Backup diario | `/backups/tamal/logs/backup_postgresql_tamal_YYYY-MM-DD.log` |
+| Verificación | `/backups/tamal/logs/verify_backup_postgresql_tamal_YYYY-MM-DD.log` |
+
+### Verificación inicial Fase 4 (2026-06-05)
+
+Ejecutada manualmente al activar cron: **6/6 OK** — tamaños local = OCI en `/backups/tamal/2026-06-05/`.
+
+### Checklist Fase 4
+
+| Paso | Estado |
+|---|---|
+| Restore La Huaca OK (aprobación) | ✅ |
+| `/etc/cron.d/backup-postgresql-tamal` | ✅ |
+| Script verify instalado | ✅ |
+| Verificación manual 6/6 | ✅ |
+| Odoo / nginx sin cambios | ✅ |
 
 ---
 

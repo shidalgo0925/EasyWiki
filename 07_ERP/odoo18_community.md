@@ -90,28 +90,26 @@ MuK Backend Theme desplegado en todas las bases activas:
 
 ---
 
-## Backup PostgreSQL — Fase 3 (script manual)
+## Backup PostgreSQL — TAMAL
 
 | Campo | Valor |
 |---|---|
-| **Estado** | **Script validado** — 2026-06-05 |
-| **Script** | `/usr/local/bin/backup_postgresql_tamal.sh` |
-| **Ejecución** | `sudo /usr/local/bin/backup_postgresql_tamal.sh` |
+| **Estado** | **Cron diario activo (Fase 4)** — 2026-06-05 |
+| **Script backup** | `/usr/local/bin/backup_postgresql_tamal.sh` |
+| **Script verify** | `/usr/local/bin/verify_backup_postgresql_tamal.sh` |
+| **Cron** | `/etc/cron.d/backup-postgresql-tamal` — **02:00** backup · **04:00** verify |
+| **Ejecución manual** | `sudo /usr/local/bin/backup_postgresql_tamal.sh` |
 | **Formato** | `pg_dump -Fc` (PostgreSQL 16.14) |
 | **Local TAMAL** | `/backups/tamal/db/YYYY-MM-DD/` |
 | **Remoto OCI** | `backupsrv@40.233.1.138:/backups/tamal/YYYY-MM-DD/` |
-| **Log** | `/backups/tamal/logs/backup_postgresql_tamal_YYYY-MM-DD.log` |
 | **Total 6 bases prod.** | **~74 MB** por ejecución |
-| **Integridad** | `pg_restore --list` antes de cada transferencia |
-| **Primera corrida** | 6/6 OK — 2026-06-05 06:21 CEST |
-| **Restauración completa** | ✅ **Fase 5** — Easydb + **lahuaca** (2026-06-05) |
-| **Cron** | **Autorizado Fase 4** — pendiente implementar |
+| **Restauración completa** | ✅ Easydb + **lahuaca** (Fase 5) |
 
 ### Bases incluidas
 
 Easydb · lahuaca · SMRC · Sanadb · TTTourism · relatic — excluida `odoo18`.
 
-Procedimiento completo: [[06_Arquitectura/servidores/TAMAL#Backup Hub OCI — Fase 3 (script manual)]].
+Procedimiento backup/cron: [[06_Arquitectura/servidores/TAMAL#Backup Hub OCI — Fase 4 (cron diario)]].
 
 ### Tamaño dump por base (referencia Fase 2.5)
 
