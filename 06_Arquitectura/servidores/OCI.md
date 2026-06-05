@@ -258,7 +258,7 @@ Preparación del host OCI como **receptor de backups** desde otros servidores Ea
 
 | Campo | Valor |
 |-------|-------|
-| **Estado** | **Listo para recibir backups** — infraestructura y llaves públicas en OCI; **TAMAL Fase 1 pendiente** (jun 2026) |
+| **Estado** | **Listo para recibir backups** — **TAMAL conectado** (Fase 1 validada 2026-06-05) |
 | **Usuario** | `backupsrv` **creado** *(sin sudo)* |
 | **Estado SSH** | **Activo** — puerto **22/tcp** (`ssh.service` enabled) |
 | **Espacio disponible** | **~30 GB** libres en `/` *(disco total 45 GB; uso prod ~16 GB)* |
@@ -325,14 +325,14 @@ Reglas vigentes al preparar el hub — **no se modificaron**:
 | Campo | Valor |
 |-------|-------|
 | **Origen** | TAMAL (`217.216.80.159`) |
-| **Clave en TAMAL** | `/root/.ssh/id_ed25519_backup_oci` — **no instalada aún** |
+| **Clave en TAMAL** | `/root/.ssh/id_ed25519_backup_oci` — instalada, fingerprint `SHA256:dvIetad3hzt3V9PfSxLblfvF53xz7Hd11klUogjIVy4` |
 | **Usuario / ruta** | `backupsrv@40.233.1.138:/backups/tamal/` |
-| **SSH TAMAL → OCI** | **No probado** — falta copiar privada desde `/home/ubuntu/.ssh/backup-hub/id_ed25519_tamal` |
-| **rsync prueba** | **No ejecutado** |
-| **Evidencia `/backups/tamal/`** | **Sin archivo de prueba** |
-| **Bloqueo** | TAMAL sin clave admin OCI (`ubuntu@40.233.1.138`); desbloqueo vía PC con `ssh-key-2025-11-15.key` |
+| **SSH TAMAL → OCI** | **OK** — `instance-20251115-1442` / `backupsrv` |
+| **Transferencia prueba** | **OK vía scp** — `tamal_to_oci_test.txt` (42 B, 2026-06-05 04:11 UTC) |
+| **rsync** | **Pendiente** — `rsync` no disponible para `backupsrv` (clave `restrict`); Fase 2: instalar o usar `scp` |
+| **Cron en TAMAL** | **No creado** (Fase 1 only) |
 
-Tras completar Fase 1, actualizar esta sección y [[06_Arquitectura/servidores/TAMAL#Backup Hub OCI — Fase 1 (conexión y prueba)]].
+Detalle: [[06_Arquitectura/servidores/TAMAL#Backup Hub OCI — Fase 1 (conexión y prueba)]].
 
 ---
 

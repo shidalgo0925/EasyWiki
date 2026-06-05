@@ -7,7 +7,7 @@
 | **Proveedor** | Contabo (AS40021) |
 | **Rol** | Servidor ERP principal multi-tenant Odoo 18 Community |
 | **Estado inspección** | 2026-06-04 — DOCUMENTADO |
-| **Backup Hub OCI** | Fase 1 — **PENDIENTE** (jun 2026) |
+| **Backup Hub OCI** | Fase 1 — **VALIDADA** (2026-06-05) |
 | **Restricción aplicada** | Solo lectura; sin reinicios ni cambios |
 
 ---
@@ -269,56 +269,58 @@ Referencia hub: [[06_Arquitectura/servidores/OCI#Backup Hub]].
 
 | Campo | Valor |
 |---|---|
-| **Estado Fase 1** | **PENDIENTE** — bloqueado en paso 1 (copia de llave) |
-| **Fecha intento** | 2026-06-05 |
-| **Clave destino en TAMAL** | `/root/.ssh/id_ed25519_backup_oci` *(aún no instalada)* |
-| **Clave origen en OCI** | `/home/ubuntu/.ssh/backup-hub/id_ed25519_tamal` |
-| **Fingerprint esperado** | `SHA256:dvIetad3hzt3V9PfSxLblfvF53xz7Hd11klUogjIVy4` |
-| **Usuario destino rsync** | `backupsrv@40.233.1.138` |
-| **Ruta destino rsync** | `/backups/tamal/` |
+| **Estado Fase 1** | **VALIDADA** — 2026-06-05 |
+| **Clave en TAMAL** | `/root/.ssh/id_ed25519_backup_oci` (modo `600`) |
+| **Fingerprint clave** | `SHA256:dvIetad3hzt3V9PfSxLblfvF53xz7Hd11klUogjIVy4` |
+| **Usuario destino** | `backupsrv@40.233.1.138` |
+| **Ruta destino** | `/backups/tamal/` |
 | **Cron / backup auto** | **No creado** (fuera de alcance Fase 1) |
 
-### Bloqueo observado (2026-06-05)
+### Instalación de llave (2026-06-05)
 
-TAMAL **no tiene** la clave admin OCI (`ssh-key-2025-11-15.key`) para alcanzar `ubuntu@40.233.1.138` y copiar la privada del backup-hub. Las claves locales (`id_ed25519_contabo`, `id_ed25519_econverso`, `id_ed25519_github_fe_hka`) no autentican en OCI.
+Copiada desde PC operador (Git Bash) en dos pasos:
 
-### Desbloqueo — un salto desde PC operador
+1. `ubuntu@40.233.1.138:/home/ubuntu/.ssh/backup-hub/id_ed25519_tamal` → PC `/tmp/`
+2. PC → `root@217.216.80.159:/root/.ssh/id_ed25519_backup_oci`
 
-Desde máquina con `~/.ssh/ssh-key-2025-11-15.key`:
+Permisos aplicados: `/root/.ssh` → `700`, clave → `600`.
 
-```bash
-scp -i ~/.ssh/ssh-key-2025-11-15.key \
-  ubuntu@40.233.1.138:/home/ubuntu/.ssh/backup-hub/id_ed25519_tamal \
-  root@217.216.80.159:/root/.ssh/id_ed25519_backup_oci
+### Pruebas ejecutadas desde TAMAL
+
+**SSH:**
+
+```text
+hostname → instance-20251115-1442
+whoami   → backupsrv
 ```
 
-Luego en TAMAL (pasos 2–5):
+**Transferencia de prueba:**
 
-```bash
-sudo chmod 700 /root/.ssh
-sudo chmod 600 /root/.ssh/id_ed25519_backup_oci
-ssh -i /root/.ssh/id_ed25519_backup_oci backupsrv@40.233.1.138 hostname
-echo "test TAMAL to OCI $(date)" > /tmp/tamal_to_oci_test.txt
-rsync -avz -e "ssh -i /root/.ssh/id_ed25519_backup_oci" \
-  /tmp/tamal_to_oci_test.txt backupsrv@40.233.1.138:/backups/tamal/
-```
+| Método | Resultado | Notas |
+|---|---|---|
+| **rsync** | **No** | `remote command not found` — `backupsrv` sin `rsync` en PATH (clave `restrict`) |
+| **scp** | **OK** | Archivo `tamal_to_oci_test.txt` recibido en `/backups/tamal/` |
 
-Validación en OCI:
+**Evidencia en OCI** (vía `backupsrv`):
 
-```bash
-ssh -i ~/.ssh/ssh-key-2025-11-15.key ubuntu@40.233.1.138 \
-  "ls -lh /backups/tamal/ && cat /backups/tamal/tamal_to_oci_test.txt"
+```text
+-rw-r--r-- 1 backupsrv backupsrv 42 Jun  5 04:11 tamal_to_oci_test.txt
+test TAMAL to OCI 2026-06-05 04:10:47 UTC
 ```
 
 ### Checklist Fase 1
 
 | Paso | Estado |
 |---|---|
-| Copiar `id_ed25519_tamal` → `/root/.ssh/id_ed25519_backup_oci` | ⏳ Pendiente |
-| Permisos `700` / `600` | ⏳ Pendiente |
-| SSH `backupsrv@40.233.1.138` | ⏳ Pendiente |
-| rsync archivo prueba | ⏳ Pendiente |
-| Evidencia en `/backups/tamal/` | ⏳ Pendiente |
+| Copiar `id_ed25519_tamal` → `/root/.ssh/id_ed25519_backup_oci` | ✅ |
+| Permisos `700` / `600` | ✅ |
+| SSH `backupsrv@40.233.1.138` | ✅ |
+| Transferencia archivo prueba | ✅ (`scp`; rsync pendiente instalar/enabled en OCI) |
+| Evidencia en `/backups/tamal/` | ✅ |
+
+### Nota Fase 2
+
+Para backups con `rsync`, instalar `rsync` en OCI accesible para `backupsrv`, o usar **`scp`** en scripts de backup (compatible con claves `restrict`).
 
 ---
 

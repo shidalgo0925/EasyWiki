@@ -9,7 +9,7 @@ Inventario lógico de **hosts y VPS** usados por Easy Technology Services.
 |---|---------------|---------------|-------|------------|
 | 1 | **CODITO** | Relatic Panamá | [[06_Arquitectura/servidores/CODITO]] | **Completa** |
 | 2 | **OCI** | Landing Pages / APIs leads / Ollama auxiliar | [[06_Arquitectura/servidores/OCI]] | **Documentado y Cerrado** |
-| 3 | **TAMAL** | ERP Odoo multi-tenant Contabo | [[06_Arquitectura/servidores/TAMAL]] | **Documentado** — Fase 1 Backup Hub OCI pendiente |
+| 3 | **TAMAL** | ERP Odoo multi-tenant Contabo | [[06_Arquitectura/servidores/TAMAL]] | **Documentado** — Backup Hub OCI Fase 1 OK |
 | 4 | **Arroz con Pollo** | Laboratorio IA / Easy Wiki / Operator | *(pendiente)* | Por hacer |
 | 5 | **Spaguetti** | IIUS (EN1) | *(pendiente)* | Por hacer |
 | 6 | **GCP histórico** | Retirado | *(pendiente)* | Por hacer |
