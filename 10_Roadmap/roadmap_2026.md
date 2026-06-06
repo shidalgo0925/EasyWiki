@@ -1,35 +1,135 @@
-# Roadmap 2026
+# Roadmap 2026 — Easy Technology Services
 
-Prioridades de **Easy Technology Services** y [[02_Suite/easy_suite|Easy Suite]] para 2026.  
-*Documento operativo — ajustar trimestralmente.*
+**Estado:** Operativo — actualización junio 2026  
+**Dueño:** Dirección Tecnológica  
+**Revisión:** Trimestral
 
-## Objetivo del año
+---
 
-Consolidar **Easy Wiki**, estabilizar **EN1 en clientes clave** y avanzar productos satélite con mensaje comercial claro.
+## Contexto Ejecutivo
 
-**Inventario productos en CODITO:** [[02_Suite/inventario_easy_suite]] (jun 2026).
+IIUS se encuentra aproximadamente al **92% de avance**.
 
-## Q1–Q2 2026 (en curso / reciente)
+La prioridad inmediata continúa siendo:
+
+1. **Cierre Modecosa**
+2. **Cierre IIUS**
+3. **Estabilización EN1**
+
+> **Restricción crítica:** No se autoriza iniciar desarrollo de mejoras del backlog estratégico hasta finalizar las prioridades anteriores.
+
+---
+
+## Estado Actual de Prioridades
+
+### PRIORIDAD 1 — MODECOSA
+
+| | |
+|---|---|
+| **Objetivo** | Cierre operativo definitivo |
+| **Estado** | EN PROCESO |
+
+**Pendientes:**
+
+- [ ] NCR Facturación Electrónica
+- [ ] Validación reversas NCR
+- [ ] Apertura sucursal El Roble
+- [ ] Validación facturación sucursal
+- [ ] Reportes contables pendientes
+- [ ] Cierre operativo
+
+---
+
+### PRIORIDAD 2 — IIUS
+
+| | |
+|---|---|
+| **Objetivo** | Entrega operativa completa |
+| **Estado** | EN PROCESO |
+
+**Pendientes:**
+
+- [ ] QA final
+- [ ] Catálogo académico
+- [ ] Pagos
+- [ ] Accesos
+- [ ] Ajustes visuales
+- [ ] Cierre funcional restante (~8%)
+
+---
+
+### PRIORIDAD 3 — EN1 COMERCIAL
+
+| | |
+|---|---|
+| **Objetivo** | Convertir EN1 en una plataforma comercial multi-producto |
+| **Estado** | PLANIFICADO |
+
+**Incluye:**
+
+- Landing comercial
+- Checkout
+- CRM
+- Facturación
+- Integración de productos
+
+---
+
+## BACKLOG ESTRATÉGICO
+
+| Iniciativa | Estado | Prioridad | Dependencias | Documento |
+|------------|--------|-----------|--------------|-----------|
+| **EN1 Navigation & Commerce Hub** | BACKLOG APROBADO | MEDIA | Finalización Modecosa, IIUS y estabilización EN1 | [[10_Roadmap/en1_navigation_commerce_hub]] |
+| **EPayRoll** | PENDIENTE | BAJA | Estabilización EN1 | *(por crear)* |
+| **Marketing Hub** | PENDIENTE | BAJA | Estabilización EN1 | *(por crear)* |
+| **EasyAgents** | PENDIENTE | BAJA | Estabilización EN1 | *(por crear)* |
+| **Gobierno Tecnológico** | PENDIENTE | BAJA | Estabilización EN1 | *(por crear)* |
+
+---
+
+## Estructura del Roadmap
+
+```
+10_Roadmap/
+│
+├── roadmap_2026.md              ← Este documento (maestro)
+├── roadmap_2027.md              ← Visión futura
+├── backlog.md                   ← Ideas no comprometidas
+│
+├── en1_navigation_commerce_hub.md  ← Iniciativa estratégica #1
+├── epayroll_roadmap.md           ← Iniciativa estratégica #2 (pendiente)
+├── marketing_hub.md              ← Iniciativa estratégica #3 (pendiente)
+├── easyagents.md                 ← Iniciativa estratégica #4 (pendiente)
+└── gobierno_tecnologico.md       ← Iniciativa estratégica #5 (pendiente)
+```
+
+> **Nota arquitectural:** Cada iniciativa estratégica tiene su propio documento para mantener el roadmap maestro limpio y preparar EasyWiki como fuente oficial de conocimiento para futuros agentes IA.
+
+---
+
+## Fases del Año
+
+### Q1–Q2 2026 (en curso / reciente)
 
 | Prioridad | Tema | Resultado esperado |
 |-----------|------|-------------------|
 | Alta | **EN1 — ERP y operación** | Menú Odoo, contactos, pagos Yappy, taller SLA, eventos/certificados desplegados en clientes. |
-| Alta | **Easy Wiki MVP** | 10 documentos + estructura; Obsidian local; repo Git. |
+| Alta | **Easy Wiki MVP** | 10+ documentos + estructura; repo Git; flujo de actualización. |
 | Alta | **Estabilidad prod** | Deploy con migraciones; sin pérdida de datos cliente. |
-| Media | **IIUS / campus** | Programas en BD, campus cerrado, pagos alineados. |
-| Media | **Modecosa / Odoo** | Catálogo seguridad v1 operativo. |
+| Media | **IIUS / campus** | Programas en BD, campus cerrado, pagos alineados (92%). |
+| Media | **Modecosa / Odoo** | Catálogo seguridad v1 operativo; FE en progreso. |
 | Media | **Factura electrónica PA** | Fase A en clientes que contraten FE. |
 
-## Q3 2026 (planificado)
+### Q3 2026 (planificado)
 
 | Prioridad | Tema |
 |-----------|------|
 | Media | Ampliar **ePosOne** (ficha comercial + pilotos). |
-| Media | **Easy Wiki** fase 2: `05_Proyectos/` y `07_Operaciones/` completos. |
+| Media | **Easy Wiki** fase 2: proyectos y operaciones completos. |
 | Media | **Marketing** campañas coordinadas ([[09_Marketing/campanas]]). |
 | Baja | **Easy Operator** (IA) — prototipo interno ([[08_IA/easy_operator]]). |
 
-## Q4 2026 (visión)
+### Q4 2026 (visión)
 
 | Prioridad | Tema |
 |-----------|------|
@@ -37,20 +137,18 @@ Consolidar **Easy Wiki**, estabilizar **EN1 en clientes clave** y avanzar produc
 | Media | **EPayRoll** / **EThesisOne** — según demanda comercial. |
 | Baja | Integraciones adicionales ([[03_Productos/integrations]]). |
 
-## Backlog
+---
 
-Ideas no comprometidas: [[10_Roadmap/backlog]]
+## Gobierno del Roadmap
 
-## 2027
-
-Borrador futuro: [[10_Roadmap/roadmap_2027]]
-
-## Cómo usar este roadmap
-
-- **Dirección:** prioriza ventas e implementación.  
-- **Desarrollo:** alinea sprints EN1 con filas “Alta”.  
-- **Cliente:** solo comunicar ítems **cerrados y desplegados** en su entorno.
+| Rol | Responsabilidad |
+|-----|-----------------|
+| Dirección | Aprueba prioridades y backlog estratégico |
+| Producto | Define alcance y dependencias por iniciativa |
+| Desarrollo | Ejecuta sprints alineados a filas "Alta" |
+| Operaciones | Valida cierres en clientes antes de mover prioridad |
+| Cliente | Solo se comunican ítems **cerrados y desplegados** |
 
 ---
 
-**Mapa de productos:** [[02_Suite/mapa_suite]] · **Marketing:** [[09_Marketing/marketing_hub]]
+**Mapa de productos:** [[02_Suite/mapa_suite]] · **Backlog:** [[10_Roadmap/backlog]] · **2027:** [[10_Roadmap/roadmap_2027]]
