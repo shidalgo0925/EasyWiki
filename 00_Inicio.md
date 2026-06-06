@@ -16,7 +16,7 @@ Bienvenido a la **wiki operativa** de [[01_Empresa/easytechnology|Easy Technolog
 
 | Capa | Entrada | Contenido |
 |------|---------|-----------|
-| **Gobierno** | [[00_Gobierno/gobierno_tecnologico]] · [[00_Gobierno/disaster_recovery_codito]] | Principios, DR, auditoría ([[00_Gobierno/matriz_cobertura]]) |
+| **Gobierno** | [[00_Gobierno/gobierno_tecnologico]] · [[00_Gobierno/disaster_recovery_codito]] · [[00_Gobierno/easytech_context]] | Principios, DR, auditoría, onboarding IA |
 | **Arquitectura de producto** | [[01_Arquitectura_Producto/easy_suite_architecture]] · [[01_Arquitectura_Producto/README]] | Relaciones EN1 · Apps · madurez · roadmap |
 | **Suite** | [[02_Suite/easy_suite]] · [[02_Suite/mapa_suite]] · [[02_Suite/inventario_easy_suite]] | Oferta · mapa comercial · inventario CODITO |
 | **Productos** | [[03_Productos/en1_platform]] · [[03_Productos/eclassone]] · [[03_Productos/ethesisone]] · [[03_Productos/eposone]] · [[03_Productos/epayroll]] · [[03_Productos/integrations]] | Fichas por producto |

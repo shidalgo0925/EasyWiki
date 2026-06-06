@@ -10,6 +10,10 @@ Reglas para que **Easy Technology Services** mantenga calidad y orden.
 4. **IA asistida, humano responsable** — [[08_IA/equipo_virtual]]; decisiones finales del equipo.  
 5. **Naming y marca** — [[02_Suite/naming_standards]].
 
+## Onboarding
+
+Nuevos integrantes, IAs y consultores deben empezar por: [[00_Gobierno/easytech_context|EasyTech Context — Documento Maestro de Onboarding]].
+
 ## Comités / roles (borrador)
 
 | Rol | Responsabilidad |

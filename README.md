@@ -25,6 +25,7 @@ Esa sintaxis es **wikilink de Obsidian**. En la web de GitHub **no** se conviert
 | **Infra** | ¿Servidor CODITO / Relatic? | [06_Arquitectura/servidores/CODITO.md](06_Arquitectura/servidores/CODITO.md) |
 | **DR** | ¿Qué pasa si cae CODITO? | [00_Gobierno/disaster_recovery_codito.md](00_Gobierno/disaster_recovery_codito.md) |
 | **Gobierno** | ¿Principios tecnológicos? | [00_Gobierno/gobierno_tecnologico.md](00_Gobierno/gobierno_tecnologico.md) |
+| **Contexto** | ¿Qué es EasyTech? (onboarding IA/nuevos) | [00_Gobierno/easytech_context.md](00_Gobierno/easytech_context.md) |
 | **Roadmap** | ¿Prioridades 2026? | [10_Roadmap/roadmap_2026.md](10_Roadmap/roadmap_2026.md) |
 
 **MVP original + operación EN1:** [07_Operaciones/deploy.md](07_Operaciones/deploy.md), [06_Arquitectura/arquitectura_en1.md](06_Arquitectura/arquitectura_en1.md), [04_Clientes/iius.md](04_Clientes/iius.md), [09_Marketing/marketing_hub.md](09_Marketing/marketing_hub.md).
