@@ -75,6 +75,25 @@ La prioridad inmediata continúa siendo:
 
 ---
 
+### PRIORIDAD 5 — EasyCoach
+
+| | |
+|---|---|
+| **Objetivo** | Transformar 1% Better Every Day en una plataforma de coaching personal con IA |
+| **Estado** | PLANIFICACIÓN |
+
+**Fases:**
+
+1. MVP sin IA
+2. Coaching guiado
+3. Descomposición de objetivos
+4. Integración Kimi
+5. Memoria persistente
+
+**Responsable:** Programador JR
+
+---
+
 ## BACKLOG ESTRATÉGICO
 
 | Iniciativa | Estado | Prioridad | Dependencias | Documento |
@@ -84,6 +103,7 @@ La prioridad inmediata continúa siendo:
 | **Marketing Hub** | PENDIENTE | BAJA | Estabilización EN1 | *(por crear)* |
 | **EasyAgents** | PENDIENTE | BAJA | Estabilización EN1 | *(por crear)* |
 | **Gobierno Tecnológico** | PENDIENTE | BAJA | Estabilización EN1 | *(por crear)* |
+| **EasyCoach** | PLANIFICACIÓN | MEDIA | Estabilización EN1 | [[05_Proyectos/EasyCoach/EasyCoach]] |
 
 ---
 
@@ -100,7 +120,8 @@ La prioridad inmediata continúa siendo:
 ├── epayroll_roadmap.md           ← Iniciativa estratégica #2 (pendiente)
 ├── marketing_hub.md              ← Iniciativa estratégica #3 (pendiente)
 ├── easyagents.md                 ← Iniciativa estratégica #4 (pendiente)
-└── gobierno_tecnologico.md       ← Iniciativa estratégica #5 (pendiente)
+├── gobierno_tecnologico.md       ← Iniciativa estratégica #5 (pendiente)
+└── easycoach.md                  ← Iniciativa estratégica #6 (pendiente)
 ```
 
 > **Nota arquitectural:** Cada iniciativa estratégica tiene su propio documento para mantener el roadmap maestro limpio y preparar EasyWiki como fuente oficial de conocimiento para futuros agentes IA.
