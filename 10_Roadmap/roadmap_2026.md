@@ -80,17 +80,25 @@ La prioridad inmediata continúa siendo:
 | | |
 |---|---|
 | **Objetivo** | Transformar 1% Better Every Day en una plataforma de coaching personal con IA |
-| **Estado** | PLANIFICACIÓN |
+| **Estado** | **EN DESARROLLO** — MVP estabilización, Caso 0 activo (Seul) |
+| **Branch código** | `feature/mvp-stabilization` en EasyWiki |
+| **Último hito** | Capa IA interactiva, actividades guiadas, tratamiento (2026-06-10) |
 
-**Fases:**
+**Fases completadas:**
 
-1. MVP sin IA
-2. Coaching guiado
-3. Descomposición de objetivos
-4. Integración Kimi
-5. Memoria persistente
+1. ✅ MVP base (plan diario, cierre, decisiones, roadmap)
+2. ✅ Google Calendar real
+3. ✅ IA real (OpenAI + multi-proveedor)
+4. ✅ Coaching guiado (actividades paso a paso, Coach ahora, chat flotante)
+5. ✅ Tratamiento activo + memoria de conversación
 
-**Responsable:** Programador JR
+**Siguiente:**
+
+- Fase 8: agenda en contexto, resúmenes diario/semanal, Daily Brief
+
+**Responsable:** Programador JR + Seul (validación)
+
+**Documentación:** [[05_Proyectos/EasyCoach/EasyCoach]] · [[05_Proyectos/EasyCoach/Coach_IA_Implementacion]]
 
 ---
 
@@ -103,7 +111,7 @@ La prioridad inmediata continúa siendo:
 | **Marketing Hub** | PENDIENTE | BAJA | Estabilización EN1 | *(por crear)* |
 | **EasyAgents** | PENDIENTE | BAJA | Estabilización EN1 | *(por crear)* |
 | **Gobierno Tecnológico** | PENDIENTE | BAJA | Estabilización EN1 | *(por crear)* |
-| **EasyCoach** | PLANIFICACIÓN | MEDIA | Estabilización EN1 | [[05_Proyectos/EasyCoach/EasyCoach]] |
+| **EasyCoach** | **EN DESARROLLO** | **ALTA** | Caso 0 activo | [[05_Proyectos/EasyCoach/EasyCoach]] |
 
 ---
 
