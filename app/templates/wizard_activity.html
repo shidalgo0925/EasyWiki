@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block title %}Nueva Actividad Guiada{% endblock %}
+
+{% block content %}
+<div class="coach-wizard">
+  <h1 class="coach-wizard__title">Nueva actividad guiada</h1>
+  <p class="coach-wizard__subtitle">Tu coach dividirá esto en pasos claros para que sepas exactamente qué hacer.</p>
+
+  <form method="POST" class="coach-card">
+    <div class="mb-3">
+      <label class="form-label">¿Qué quieres lograr?</label>
+      <input type="text" name="title" class="form-control" required placeholder="Ej: Cerrar pendiente Modecosa">
+    </div>
+    <div class="mb-3">
+      <label class="form-label">Objetivo / resultado esperado</label>
+      <textarea name="objective" class="form-control" rows="2" placeholder="¿Cómo sabrás que terminaste bien?"></textarea>
+    </div>
+    <div class="mb-3">
+      <label class="form-label">¿A qué proyecto pertenece?</label>
+      <input type="text" name="project_key" class="form-control" placeholder="Ej: Modecosa, EN1, EasyTech">
+    </div>
+    <div class="row g-3 mb-3">
+      <div class="col-md-4">
+        <label class="form-label">Fecha</label>
+        <input type="date" name="scheduled_date" class="form-control">
+      </div>
+      <div class="col-md-4">
+        <label class="form-label">Hora sugerida</label>
+        <input type="time" name="scheduled_time" class="form-control">
+      </div>
+      <div class="col-md-4">
+        <label class="form-label">Duración (min)</label>
+        <input type="number" name="estimated_minutes" class="form-control" value="30" min="5" max="480">
+      </div>
+    </div>
+    <div class="mb-3">
+      <label class="form-label">Prioridad</label>
+      <select name="priority" class="form-select">
+        <option value="1">Alta</option>
+        <option value="2" selected>Media</option>
+        <option value="3">Baja</option>
+      </select>
+    </div>
+    <div class="form-check mb-3">
+      <input class="form-check-input" type="checkbox" name="start_now" value="1" id="startNow">
+      <label class="form-check-label" for="startNow">Iniciar actividad al crear</label>
+    </div>
+    <p class="small text-muted">Se crearán 5 pasos guiados automáticamente (sin IA externa).</p>
+    <button type="submit" class="coach-btn coach-btn--primary">Crear actividad</button>
+  </form>
+</div>
+{% endblock %}

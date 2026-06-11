@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+{% block title %}Decisiones{% endblock %}
+{% block content %}
+<div class="container py-4">
+  <h2 class="mb-4">Decisiones Estratégicas</h2>
+
+  <div class="card card-soft mb-4">
+    <div class="card-body">
+      <h5 class="card-title">Nueva decisión</h5>
+      <form method="POST" action="{{ url_for('strategy.decision_new') }}">
+        <div class="row g-2">
+          <div class="col-md-6">
+            <input type="text" class="form-control" name="title" placeholder="Título de la decisión" required>
+          </div>
+          <div class="col-md-3">
+            <input type="date" class="form-control" name="decision_date" value="{{ today }}">
+          </div>
+          <div class="col-md-3">
+            <input type="date" class="form-control" name="review_date" placeholder="Revisión">
+          </div>
+          <div class="col-12">
+            <textarea class="form-control" name="contexto" rows="2" placeholder="Contexto / razón"></textarea>
+          </div>
+          <div class="col-12">
+            <textarea class="form-control" name="impacto" rows="2" placeholder="Impacto esperado"></textarea>
+          </div>
+          <div class="col-12">
+            <button type="submit" class="btn btn-primary">Registrar</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  {% if items %}
+    <div class="table-responsive">
+      <table class="table table-sm table-hover align-middle">
+        <thead>
+          <tr>
+            <th>Fecha</th>
+            <th>Decisión</th>
+            <th>Contexto</th>
+            <th>Estado</th>
+            <th>Revisión</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for d in items %}
+          <tr>
+            <td>{{ d.decision_date }}</td>
+            <td><strong>{{ d.title }}</strong></td>
+            <td class="text-muted small">{{ d.contexto or '—' }}</td>
+            <td>
+              <form method="POST" action="{{ url_for('strategy.decision_update', id=d.id) }}" class="d-flex gap-1">
+                <select class="form-select form-select-sm" name="estado" style="width:110px" onchange="this.form.submit()">
+                  <option value="activa" {% if d.estado=='activa' %}selected{% endif %}>Activa</option>
+                  <option value="revisada" {% if d.estado=='revisada' %}selected{% endif %}>Revisada</option>
+                  <option value="archivada" {% if d.estado=='archivada' %}selected{% endif %}>Archivada</option>
+                </select>
+              </form>
+            </td>
+            <td>{{ d.review_date or '—' }}</td>
+            <td></td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <div class="alert alert-light">No hay decisiones registradas.</div>
+  {% endif %}
+</div>
+{% endblock %}

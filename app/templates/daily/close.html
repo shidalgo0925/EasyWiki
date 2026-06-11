@@ -1,0 +1,119 @@
+{% extends "base.html" %}
+{% block title %}Cierre Diario{% endblock %}
+{% block content %}
+<div class="container py-4">
+  <h2 class="mb-4">Cierre del Día — {{ today }}</h2>
+
+  {% if not daily %}
+    <div class="alert alert-info">
+      No hay foco diario para hoy. <a href="{{ url_for('ai_wizard.ai_plan') }}">Crear plan con IA</a>
+    </div>
+  {% else %}
+    <div class="card card-soft mb-4">
+      <div class="card-body">
+        <h5 class="card-title">Foco del día</h5>
+        {% if daily.intencion %}
+          <p class="text-muted">{{ daily.intencion }}</p>
+        {% endif %}
+        <p class="mb-0"><strong>Energía inicial:</strong> {{ daily.energia_nivel or '—' }}/5</p>
+      </div>
+    </div>
+
+    <form method="POST">
+      <div class="card card-soft mb-4">
+        <div class="card-body">
+          <h5 class="card-title">Microacciones</h5>
+          {% if items %}
+            <ul class="list-group list-group-flush">
+              {% for item in items %}
+                <li class="list-group-item d-flex align-items-center gap-2">
+                  <input class="form-check-input" type="checkbox" name="completed_items" value="{{ item.id }}"
+                    {% if item.estado == 'completada' %}checked disabled{% endif %}>
+                  <div class="flex-grow-1">
+                    <strong>{{ item.titulo }}</strong>
+                    <span class="badge bg-secondary ms-1">{{ item.categoria or '—' }}</span>
+                    {% if item.duracion_min %}<small class="text-muted">({{ item.duracion_min }} min)</small>{% endif %}
+                  </div>
+                  <span class="badge {% if item.estado == 'completada' %}bg-success{% elif item.estado == 'en_progreso' %}bg-warning{% else %}bg-light text-dark{% endif %}">
+                    {{ item.estado }}
+                  </span>
+                </li>
+              {% endfor %}
+            </ul>
+          {% else %}
+            <p class="text-muted">No hay microacciones registradas.</p>
+          {% endif %}
+        </div>
+      </div>
+
+      <div class="card card-soft mb-4">
+        <div class="card-body">
+          <h5 class="card-title">Reflexión diaria</h5>
+          <div class="mb-3">
+            <label class="form-label">¿Qué funcionó hoy?</label>
+            <textarea class="form-control" name="que_funciono" rows="2">{{ reflection.que_funciono if reflection else '' }}</textarea>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">¿Qué te bloqueó?</label>
+            <textarea class="form-control" name="que_bloqueo" rows="2">{{ reflection.que_bloqueo if reflection else '' }}</textarea>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">¿Qué aprendiste?</label>
+            <textarea class="form-control" name="aprendizaje" rows="2">{{ reflection.aprendizaje if reflection else '' }}</textarea>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Ajuste para mañana</label>
+            <textarea class="form-control" name="ajuste_manana" rows="2">{{ reflection.ajuste_manana if reflection else '' }}</textarea>
+          </div>
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label class="form-label">Estado de ánimo</label>
+              <input type="text" class="form-control" name="estado_animo" value="{{ reflection.estado_animo if reflection else '' }}" placeholder="ej: motivado, cansado, enfocado">
+            </div>
+            <div class="col-md-6 mb-3">
+              <label class="form-label">Energía final (1-5)</label>
+              <input type="number" class="form-control" name="energia_final" min="1" max="5"
+                value="{{ reflection.energia_final if reflection else '' }}">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card card-soft mb-4">
+        <div class="card-body">
+          <h5 class="card-title">Logros del día</h5>
+          {% if wins %}
+            <ul class="list-group list-group-flush mb-3">
+              {% for w in wins %}
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                  <span><strong>{{ w.titulo }}</strong>{% if w.descripcion %} — {{ w.descripcion }}{% endif %}</span>
+                  <span class="badge bg-info">{{ w.impacto }}</span>
+                </li>
+              {% endfor %}
+            </ul>
+          {% endif %}
+          <div class="row g-2">
+            <div class="col-md-5">
+              <input type="text" class="form-control" name="win_titulo" placeholder="Título del logro">
+            </div>
+            <div class="col-md-4">
+              <input type="text" class="form-control" name="win_descripcion" placeholder="Descripción (opcional)">
+            </div>
+            <div class="col-md-3">
+              <select class="form-select" name="win_impacto">
+                <option value="bajo">Bajo</option>
+                <option value="medio" selected>Medio</option>
+                <option value="alto">Alto</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+        <button type="submit" class="btn btn-primary btn-lg">Guardar cierre diario</button>
+      </div>
+    </form>
+  {% endif %}
+</div>
+{% endblock %}

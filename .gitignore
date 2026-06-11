@@ -1,0 +1,55 @@
+# Entorno virtual
+venv/
+env/
+.venv/
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+
+# Variables de entorno
+.env
+.env.local
+
+# Credenciales y tokens
+.secrets/
+tokens/
+credentials/
+instance/
+client_secret*.json
+*.secrets.json
+
+# Logs
+logs/
+*.log
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Backups
+*.bak
+*.backup
+
+# Alembic cache
+migrations/versions/__pycache__/
+migrations/__pycache__/
+
+# Base de datos local
+*.db
+*.sqlite
+*.sqlite3
+easycoach_dev.db
+
+# Archivos huérfanos del proyecto anterior
+extensions.py
+app/static/img/logo_1percent_better.png

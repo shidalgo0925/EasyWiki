@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+{% block title %}{{ activity.title }}{% endblock %}
+
+{% block content %}
+<div class="coach-wizard">
+  <div class="d-flex flex-wrap justify-content-between align-items-start gap-2 mb-3">
+    <div>
+      <h1 class="coach-wizard__title">{{ activity.title }}</h1>
+      {% if activity.objective %}
+      <p class="coach-wizard__subtitle">{{ activity.objective }}</p>
+      {% endif %}
+    </div>
+    <span class="badge bg-primary">{{ activity.status }}</span>
+  </div>
+
+  {% set completed = activity.steps | selectattr('status', 'equalto', 'completed') | list | length %}
+  {% set total = activity.steps | length %}
+  <div class="coach-wizard__progress mb-3">
+    <div class="coach-wizard__progress-bar" style="width: {{ (completed / total * 100) if total else 0 }}%;">
+      {{ completed }}/{{ total }} pasos
+    </div>
+  </div>
+
+  <div class="coach-action-list mb-4">
+    {% for step in activity.steps %}
+    <div class="coach-action-item {% if step.status == 'completed' %}is-done{% endif %} {% if step.status == 'active' %}border border-primary{% endif %}">
+      <div class="flex-grow-1">
+        <div class="coach-action-item__title">{{ step.step_order }}. {{ step.title }}</div>
+        {% if step.description %}
+        <small class="text-muted">{{ step.description }}</small>
+        {% endif %}
+        {% if step.expected_output %}
+        <div class="small mt-1"><strong>Esperado:</strong> {{ step.expected_output }}</div>
+        {% endif %}
+        {% if step.user_response %}
+        <div class="small mt-1 text-success"><strong>Tu respuesta:</strong> {{ step.user_response }}</div>
+        {% endif %}
+      </div>
+      <span class="coach-action-item__status {% if step.status == 'completed' %}is-completed{% elif step.status == 'active' %}is-progress{% endif %}">
+        {{ step.status }}
+      </span>
+    </div>
+    {% endfor %}
+  </div>
+
+  {% set current = activity.steps | selectattr('status', 'equalto', 'active') | first %}
+  {% if not current %}
+    {% set current = activity.steps | selectattr('status', 'equalto', 'pending') | first %}
+  {% endif %}
+
+  {% if current and activity.status != 'completed' %}
+  <div class="coach-ai-card mb-4">
+    <h2 class="coach-ai-card__title">Paso actual: {{ current.title }}</h2>
+    <p class="coach-ai-card__text">{{ current.description or 'Completa este paso y avanza.' }}</p>
+    <form method="POST" action="{{ url_for('coach.activity_complete_step', activity_id=activity.id, step_id=current.id) }}">
+      {% if current.user_input_required or true %}
+      <div class="mb-3">
+        <label class="form-label text-white-50">¿Qué hiciste / qué resultado obtuviste?</label>
+        <textarea name="user_response" class="form-control" rows="2" placeholder="Opcional — registra tu avance"></textarea>
+      </div>
+      {% endif %}
+      <button type="submit" class="coach-btn">Completar paso</button>
+    </form>
+  </div>
+  {% endif %}
+
+  <div class="d-flex flex-wrap gap-2">
+    {% if activity.status in ('draft', 'scheduled', 'paused') %}
+    <form method="POST" action="{{ url_for('coach.activity_start', activity_id=activity.id) }}">
+      <button type="submit" class="coach-btn coach-btn--primary">Iniciar</button>
+    </form>
+    {% endif %}
+    {% if activity.status == 'active' %}
+    <form method="POST" action="{{ url_for('coach.activity_pause', activity_id=activity.id) }}">
+      <button type="submit" class="coach-btn coach-btn--secondary">Pausar</button>
+    </form>
+    {% endif %}
+    {% if activity.status != 'completed' %}
+    <form method="POST" action="{{ url_for('coach.activity_complete', activity_id=activity.id) }}" onsubmit="return confirm('¿Finalizar actividad completa?')">
+      <button type="submit" class="coach-btn coach-btn--ghost">Finalizar actividad</button>
+    </form>
+    {% endif %}
+    <a href="{{ url_for('dashboard.dashboard') }}" class="coach-btn coach-btn--secondary">Volver al dashboard</a>
+  </div>
+</div>
+{% endblock %}

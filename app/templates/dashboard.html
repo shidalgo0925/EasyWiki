@@ -1,0 +1,268 @@
+{% extends "base.html" %}
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+{% set user_name = (current_user.nombre or current_user.email.split('@')[0]) if current_user else none %}
+
+<header class="coach-header">
+  <div>
+    <h1 class="coach-header__title">
+      {% if user_name %}Buenos días, {{ user_name }}{% else %}Buenos días{% endif %}
+    </h1>
+    <p class="coach-header__subtitle">Tu coach IA preparó tu día.</p>
+  </div>
+  <span class="coach-badge-ai">Coach IA activo</span>
+</header>
+
+{% if not active_treatment %}
+<div class="coach-card mb-3" style="border-left: 4px solid var(--coach-ai); background: linear-gradient(90deg, rgba(124,58,237,.06), transparent);">
+  <div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
+    <div>
+      <strong>Completa tu tratamiento de coaching</strong>
+      <p class="mb-0 small text-muted">EasyCoach necesita conocer tu punto de partida para acompañarte mejor.</p>
+    </div>
+    <a href="{{ url_for('treatment_wizard.treatment_wizard') }}" class="coach-btn coach-btn--primary">Iniciar wizard</a>
+  </div>
+</div>
+{% else %}
+<div class="coach-card mb-3" style="border-left: 4px solid var(--coach-success);">
+  <div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
+    <div>
+      <strong>Tratamiento activo</strong> — {{ active_treatment.primary_area or 'General' }}
+      <p class="mb-0 small text-muted">{{ active_treatment.goal_30_days[:80] ~ ('…' if active_treatment.goal_30_days and active_treatment.goal_30_days|length > 80 else '') if active_treatment.goal_30_days else 'Meta 30d pendiente de detalle' }}</p>
+    </div>
+    <a href="{{ url_for('treatment_wizard.treatment_wizard') }}" class="coach-btn coach-btn--ghost coach-btn--sm">Editar</a>
+  </div>
+</div>
+{% endif %}
+
+{# --- Coach ahora --- #}
+<div class="coach-now mb-3">
+  <div class="coach-now__header">
+    <span class="coach-now__label">Coach ahora</span>
+    {% if coach_now.warning %}
+    <span class="coach-now__warning">{{ coach_now.warning }}</span>
+    {% endif %}
+  </div>
+  <p class="coach-now__status">{{ coach_now.current_status }}</p>
+  <p class="coach-now__action">{{ coach_now.recommended_action }}</p>
+  {% if coach_now.progress_label %}
+  <p class="coach-now__progress">{{ coach_now.progress_label }}</p>
+  {% endif %}
+  {% if coach_now.habit_reminder %}
+  <p class="coach-now__habit">💧 {{ coach_now.habit_reminder }}</p>
+  {% endif %}
+  <div class="coach-now__actions d-flex flex-wrap gap-2 mt-3">
+    {% if coach_now.cta_primary %}
+      {% if coach_now.cta_primary.action == 'start' %}
+      <button type="button" class="coach-btn coach-btn--primary" data-coach-action="start" data-activity-id="{{ coach_now.cta_primary.activity_id }}">
+        {{ coach_now.cta_primary.label }}
+      </button>
+      {% elif coach_now.cta_primary.url %}
+      <a href="{{ coach_now.cta_primary.url }}" class="coach-btn coach-btn--primary">{{ coach_now.cta_primary.label }}</a>
+      {% endif %}
+    {% endif %}
+    {% if coach_now.cta_secondary %}
+      {% if coach_now.cta_secondary.action == 'pause' %}
+      <button type="button" class="coach-btn coach-btn--secondary" data-coach-action="pause" data-activity-id="{{ coach_now.cta_secondary.activity_id }}">
+        {{ coach_now.cta_secondary.label }}
+      </button>
+      {% elif coach_now.cta_secondary.action == 'water' %}
+      <button type="button" class="coach-btn coach-btn--ghost" data-coach-action="water">{{ coach_now.cta_secondary.label }}</button>
+      {% elif coach_now.cta_secondary.url %}
+      <a href="{{ coach_now.cta_secondary.url }}" class="coach-btn coach-btn--secondary">{{ coach_now.cta_secondary.label }}</a>
+      {% endif %}
+    {% endif %}
+  </div>
+</div>
+
+<div class="coach-meta-bar">
+  <span><strong>Google:</strong>
+    {% if google_connected %}
+      Conectada
+      <a href="{{ url_for('auth.google_disconnect') }}" class="coach-btn coach-btn--ghost coach-btn--sm ms-1">Desconectar</a>
+      <button id="btnSyncCalendar" class="coach-btn coach-btn--secondary coach-btn--sm ms-1">Sync calendario</button>
+    {% else %}
+      No conectada
+      <a href="{{ url_for('auth.google_connect') }}" class="coach-btn coach-btn--primary coach-btn--sm ms-1">Conectar</a>
+    {% endif %}
+  </span>
+  <span><strong>Hoy:</strong> {{ stats.hoy }}</span>
+</div>
+
+<div class="coach-kpi-grid">
+  <div class="coach-kpi-card">
+    <div class="coach-kpi-card__label">Meta DIC</div>
+    <div class="coach-kpi-card__value">${{ stats.meta_dic }}</div>
+  </div>
+  <div class="coach-kpi-card">
+    <div class="coach-kpi-card__label">Prospección</div>
+    <div class="coach-kpi-card__value">{{ stats.prospeccion_min }} min</div>
+  </div>
+  <div class="coach-kpi-card">
+    <div class="coach-kpi-card__label">Eventos</div>
+    <div class="coach-kpi-card__value">{{ stats.total_eventos }}</div>
+  </div>
+  <div class="coach-kpi-card">
+    <div class="coach-kpi-card__label">Disciplina</div>
+    <div class="coach-kpi-card__value">
+      {% if plan_items_today %}{{ completion_pct }}%{% else %}Pendiente{% endif %}
+    </div>
+    <div class="coach-kpi-card__hint">Basado en acciones del plan</div>
+  </div>
+</div>
+
+<div class="coach-ai-card">
+  <h2 class="coach-ai-card__title">Coach IA</h2>
+  {% if plan_items_today %}
+    <p class="coach-ai-card__text">Tu coach IA revisará tus acciones y te dará recomendaciones.</p>
+    <a href="{{ url_for('ai_wizard.ai_plan') }}" class="coach-btn">Ver recomendaciones</a>
+  {% else %}
+    <p class="coach-ai-card__text">Tu coach IA puede ayudarte a crear tu plan de enfoque para hoy.</p>
+    <a href="{{ url_for('ai_wizard.ai_plan') }}" class="coach-btn">Crear plan con IA</a>
+  {% endif %}
+</div>
+
+<div class="coach-card mb">
+  <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+    <h2 class="coach-card__title m-0">
+      Plan {{ plan_is_today and "de Hoy" or ("para " ~ plan_date) }}
+      {% if not plan_is_today and plan_items_today %}
+        <span class="badge bg-secondary ms-1">Próximo</span>
+      {% endif %}
+    </h2>
+    <div class="d-flex gap-2">
+      {% if not plan_is_today and plan_items_today %}
+        <button id="btnMoveToToday" class="coach-btn coach-btn--ghost coach-btn--sm">Mover a hoy</button>
+      {% endif %}
+    </div>
+  </div>
+
+  {% if plan_items_today %}
+    <div class="coach-action-list">
+      {% for it in plan_items_today %}
+      <div class="coach-action-item {% if it.estado == 'completada' %}is-done{% endif %}">
+        <span class="coach-action-item__title">{{ it.titulo }}</span>
+        <span class="coach-action-item__status {% if it.estado == 'completada' %}is-completed{% elif it.estado == 'en_progreso' %}is-progress{% endif %}">
+          {{ it.estado }}
+        </span>
+        {% if it.estado != 'completada' %}
+          <a href="{{ url_for('daily_close.close') }}" class="coach-btn coach-btn--primary coach-btn--sm">Completar</a>
+        {% endif %}
+      </div>
+      {% endfor %}
+    </div>
+    <div class="coach-progress">
+      <div class="coach-progress__bar {% if completion_pct >= 80 %}is-high{% elif completion_pct >= 50 %}is-mid{% else %}is-low{% endif %}"
+           style="width: {{ completion_pct }}%;"></div>
+    </div>
+    <small class="text-muted">{{ completion_pct }}% completado</small>
+  {% else %}
+    <p class="coach-empty">Aún no tienes acciones para hoy.</p>
+    <a href="{{ url_for('ai_wizard.ai_plan') }}" class="coach-btn coach-btn--primary">Crear plan con IA</a>
+  {% endif %}
+</div>
+
+<div class="coach-grid-2">
+  <div class="coach-card">
+    <h3 class="coach-card__title">Última reflexión</h3>
+    {% if latest_reflection %}
+      <p class="mb-1"><strong>{{ latest_reflection.fecha }}</strong> — {{ latest_reflection.estado_animo or 'Sin estado' }}</p>
+      <p class="small text-muted mb-0">{{ latest_reflection.que_funciono or 'Sin reflexión' }}</p>
+    {% else %}
+      <p class="coach-empty mb-0">Aún no hay reflexiones registradas.</p>
+    {% endif %}
+    <a href="{{ url_for('daily_close.close') }}" class="coach-btn coach-btn--ghost coach-btn--sm mt-3">Cerrar día</a>
+  </div>
+
+  <div class="coach-card" id="coach-logros">
+    <h3 class="coach-card__title">Últimos logros</h3>
+    {% if latest_wins %}
+      <ul class="list-unstyled mb-0">
+        {% for w in latest_wins %}
+        <li class="d-flex justify-content-between align-items-center mb-2">
+          <small>{{ w.titulo }}</small>
+          <span class="badge bg-info">{{ w.impacto }}</span>
+        </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p class="coach-empty mb-0">Aún no hay logros registrados.</p>
+    {% endif %}
+  </div>
+</div>
+
+<div class="coach-grid-2">
+  <div class="coach-card">
+    <h3 class="coach-card__title">Decisiones activas</h3>
+    {% if active_decisions %}
+      <ul class="list-unstyled mb-2">
+        {% for d in active_decisions %}
+        <li class="mb-2">
+          <small><strong>{{ d.title }}</strong></small><br>
+          <small class="text-muted">{{ d.decision_date }}</small>
+        </li>
+        {% endfor %}
+      </ul>
+      <a href="{{ url_for('strategy.decisions_list') }}" class="coach-section-link">Ver todas →</a>
+    {% else %}
+      <p class="coach-empty mb-0">No hay decisiones activas.</p>
+    {% endif %}
+  </div>
+
+  <div class="coach-card">
+    <h3 class="coach-card__title">Roadmap alerta</h3>
+    {% if roadmap_alert %}
+      <ul class="list-unstyled mb-2">
+        {% for r in roadmap_alert %}
+        <li class="d-flex justify-content-between align-items-center mb-2">
+          <small>{{ r.nombre }}</small>
+          <span class="badge {% if r.estado=='bloqueado' %}bg-danger{% else %}bg-warning text-dark{% endif %}">{{ r.estado }}</span>
+        </li>
+        {% endfor %}
+      </ul>
+      <a href="{{ url_for('strategy.roadmap_list') }}" class="coach-section-link">Ver roadmap →</a>
+    {% else %}
+      <p class="coach-empty mb-0">No hay items bloqueados o en progreso.</p>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/live_coach.js') }}"></script>
+<script>
+(function(){
+  var btn = document.getElementById('btnMoveToToday');
+  if (btn) {
+    btn.addEventListener('click', async function(){
+      btn.disabled = true;
+      var res = await fetch('/api/ai/plan/move_to_today', {
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({ user_id: 1, from_fecha: "{{ plan_date }}" })
+      });
+      var j = await res.json();
+      if (j.ok) location.reload();
+      else alert('Error: ' + (j.error || 'desconocido'));
+    });
+  }
+
+  var btnSync = document.getElementById('btnSyncCalendar');
+  if (btnSync) {
+    btnSync.addEventListener('click', async function(){
+      btnSync.disabled = true;
+      var res = await fetch('/api/ai/plan/sync_calendar', {
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({})
+      });
+      var j = await res.json();
+      alert(j.ok ? j.message : ('Error: ' + (j.error || 'desconocido')));
+      btnSync.disabled = false;
+      if (j.ok) location.reload();
+    });
+  }
+})();
+</script>
+{% endblock %}

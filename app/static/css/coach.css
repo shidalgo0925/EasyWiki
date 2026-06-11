@@ -1,0 +1,715 @@
+/* EasyCoach — Coaching IA SaaS theme */
+:root {
+  --coach-bg: #F6F8FB;
+  --coach-sidebar: #08111F;
+  --coach-sidebar-text: #94A3B8;
+  --coach-sidebar-active: #2563EB;
+  --coach-primary: #2563EB;
+  --coach-ai: #7C3AED;
+  --coach-success: #10B981;
+  --coach-warning: #F59E0B;
+  --coach-text: #111827;
+  --coach-text-muted: #6B7280;
+  --coach-border: #E5E7EB;
+  --coach-card: #FFFFFF;
+  --coach-radius: 16px;
+  --coach-radius-sm: 12px;
+  --coach-shadow: 0 4px 24px rgba(15, 23, 42, 0.06);
+  --coach-shadow-lg: 0 12px 40px rgba(15, 23, 42, 0.1);
+  --coach-sidebar-w: 248px;
+}
+
+body.coach-app {
+  min-height: 100vh;
+  background: var(--coach-bg);
+  color: var(--coach-text);
+  font-family: Inter, system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+
+.coach-shell {
+  display: grid;
+  grid-template-columns: var(--coach-sidebar-w) 1fr;
+  min-height: 100vh;
+}
+
+/* Sidebar */
+.coach-sidebar {
+  background: var(--coach-sidebar);
+  color: #E2E8F0;
+  padding: 1.25rem 1rem;
+  display: flex;
+  flex-direction: column;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow-y: auto;
+}
+
+.coach-sidebar__brand {
+  display: flex;
+  align-items: center;
+  gap: .625rem;
+  font-weight: 700;
+  font-size: 1.125rem;
+  letter-spacing: -.02em;
+  margin-bottom: 1.75rem;
+  color: #fff;
+}
+
+.coach-sidebar__brand-mark {
+  width: 32px;
+  height: 32px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, var(--coach-primary), var(--coach-ai));
+  display: grid;
+  place-items: center;
+  font-size: .75rem;
+  font-weight: 800;
+}
+
+.coach-sidebar__section {
+  font-size: .65rem;
+  font-weight: 700;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: #64748B;
+  padding: .75rem .75rem .35rem;
+}
+
+.coach-sidebar__nav {
+  display: flex;
+  flex-direction: column;
+  gap: .25rem;
+}
+
+.coach-sidebar__link {
+  display: flex;
+  align-items: center;
+  gap: .625rem;
+  padding: .65rem .75rem;
+  border-radius: var(--coach-radius-sm);
+  color: var(--coach-sidebar-text);
+  text-decoration: none;
+  font-size: .9rem;
+  font-weight: 500;
+  transition: background .15s, color .15s;
+}
+
+.coach-sidebar__link svg {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  opacity: .85;
+}
+
+.coach-sidebar__link:hover {
+  background: rgba(255, 255, 255, .06);
+  color: #fff;
+}
+
+.coach-sidebar__link.active {
+  background: var(--coach-sidebar-active);
+  color: #fff;
+}
+
+.coach-sidebar__link.is-disabled {
+  opacity: .45;
+  pointer-events: none;
+  cursor: not-allowed;
+}
+
+.coach-sidebar__footer {
+  margin-top: auto;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(255, 255, 255, .08);
+  font-size: .75rem;
+  color: #64748B;
+}
+
+/* Main */
+.coach-main {
+  padding: 1.5rem 2rem 5rem;
+  max-width: 1200px;
+}
+
+/* Header */
+.coach-header {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.coach-header__title {
+  font-size: 1.75rem;
+  font-weight: 700;
+  line-height: 1.2;
+  margin: 0 0 .35rem;
+}
+
+.coach-header__subtitle {
+  color: var(--coach-text-muted);
+  margin: 0;
+  font-size: 1rem;
+}
+
+.coach-badge-ai {
+  display: inline-flex;
+  align-items: center;
+  gap: .4rem;
+  padding: .45rem .85rem;
+  border-radius: 999px;
+  background: linear-gradient(135deg, rgba(37, 99, 235, .12), rgba(124, 58, 237, .12));
+  color: var(--coach-ai);
+  font-size: .8rem;
+  font-weight: 600;
+  border: 1px solid rgba(124, 58, 237, .2);
+}
+
+.coach-badge-ai::before {
+  content: "";
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--coach-success);
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, .25);
+}
+
+/* Cards */
+.coach-card {
+  background: var(--coach-card);
+  border: 1px solid var(--coach-border);
+  border-radius: var(--coach-radius);
+  box-shadow: var(--coach-shadow);
+  padding: 1.25rem 1.5rem;
+}
+
+.coach-card__title {
+  font-size: .75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+  color: var(--coach-text-muted);
+  margin: 0 0 .75rem;
+}
+
+.coach-card + .coach-card,
+.coach-card.mb {
+  margin-bottom: 1.25rem;
+}
+
+/* KPI grid */
+.coach-kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+}
+
+.coach-kpi-card {
+  background: var(--coach-card);
+  border: 1px solid var(--coach-border);
+  border-radius: var(--coach-radius);
+  padding: 1.1rem 1.25rem;
+  box-shadow: var(--coach-shadow);
+}
+
+.coach-kpi-card__label {
+  font-size: .78rem;
+  font-weight: 600;
+  color: var(--coach-text-muted);
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  margin-bottom: .35rem;
+}
+
+.coach-kpi-card__value {
+  font-size: 1.5rem;
+  font-weight: 700;
+  line-height: 1.1;
+}
+
+.coach-kpi-card__hint {
+  font-size: .75rem;
+  color: var(--coach-text-muted);
+  margin-top: .25rem;
+}
+
+/* Coach IA card */
+.coach-ai-card {
+  background: linear-gradient(135deg, #1E3A8A 0%, #5B21B6 100%);
+  color: #fff;
+  border: none;
+  border-radius: var(--coach-radius);
+  padding: 1.5rem;
+  box-shadow: var(--coach-shadow-lg);
+  margin-bottom: 1.25rem;
+}
+
+.coach-ai-card__title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin: 0 0 .5rem;
+}
+
+.coach-ai-card__text {
+  opacity: .9;
+  margin: 0 0 1rem;
+  font-size: .95rem;
+  line-height: 1.5;
+}
+
+.coach-ai-card .coach-btn {
+  background: #fff;
+  color: var(--coach-ai);
+}
+
+.coach-ai-card .coach-btn:hover {
+  background: #F8FAFC;
+}
+
+/* Action list */
+.coach-action-list {
+  display: flex;
+  flex-direction: column;
+  gap: .65rem;
+}
+
+.coach-action-item {
+  display: flex;
+  align-items: center;
+  gap: .75rem;
+  padding: .85rem 1rem;
+  border: 1px solid var(--coach-border);
+  border-radius: var(--coach-radius-sm);
+  background: #FAFBFC;
+}
+
+.coach-action-item.is-done {
+  opacity: .65;
+}
+
+.coach-action-item__title {
+  flex: 1;
+  font-weight: 500;
+}
+
+.coach-action-item.is-done .coach-action-item__title {
+  text-decoration: line-through;
+  color: var(--coach-text-muted);
+}
+
+.coach-action-item__status {
+  font-size: .75rem;
+  font-weight: 600;
+  padding: .2rem .55rem;
+  border-radius: 999px;
+  background: #F3F4F6;
+  color: var(--coach-text-muted);
+}
+
+.coach-action-item__status.is-completed {
+  background: rgba(16, 185, 129, .12);
+  color: var(--coach-success);
+}
+
+.coach-action-item__status.is-progress {
+  background: rgba(245, 158, 11, .12);
+  color: var(--coach-warning);
+}
+
+/* Buttons */
+.coach-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: .4rem;
+  padding: .65rem 1.15rem;
+  border-radius: var(--coach-radius-sm);
+  font-size: .9rem;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  text-decoration: none;
+  transition: background .15s, opacity .15s;
+}
+
+.coach-btn--primary {
+  background: var(--coach-primary);
+  color: #fff;
+}
+
+.coach-btn--primary:hover {
+  background: #1D4ED8;
+  color: #fff;
+}
+
+.coach-btn--secondary {
+  background: #F3F4F6;
+  color: var(--coach-text);
+  border: 1px solid var(--coach-border);
+}
+
+.coach-btn--secondary:hover {
+  background: #E5E7EB;
+  color: var(--coach-text);
+}
+
+.coach-btn--ghost {
+  background: transparent;
+  color: var(--coach-primary);
+  border: 1px solid var(--coach-border);
+}
+
+.coach-btn--sm {
+  padding: .4rem .75rem;
+  font-size: .8rem;
+}
+
+.coach-btn:disabled {
+  opacity: .45;
+  cursor: not-allowed;
+}
+
+/* Grid sections */
+.coach-grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+}
+
+.coach-section-link {
+  font-size: .85rem;
+  color: var(--coach-primary);
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.coach-empty {
+  color: var(--coach-text-muted);
+  padding: 1rem 0;
+}
+
+.coach-progress {
+  height: 8px;
+  background: #E5E7EB;
+  border-radius: 999px;
+  overflow: hidden;
+  margin-top: .75rem;
+}
+
+.coach-progress__bar {
+  height: 100%;
+  border-radius: 999px;
+  transition: width .3s;
+}
+
+.coach-progress__bar.is-high { background: var(--coach-success); }
+.coach-progress__bar.is-mid { background: var(--coach-warning); }
+.coach-progress__bar.is-low { background: #EF4444; }
+
+/* Wizard */
+.coach-wizard {
+  max-width: 760px;
+}
+
+.coach-wizard__title {
+  font-size: 1.65rem;
+  font-weight: 700;
+  margin: 0 0 .35rem;
+}
+
+.coach-wizard__subtitle {
+  color: var(--coach-text-muted);
+  margin: 0 0 1.5rem;
+  line-height: 1.5;
+}
+
+.coach-wizard__progress {
+  height: 10px;
+  background: #E5E7EB;
+  border-radius: 999px;
+  overflow: hidden;
+  margin-bottom: .5rem;
+}
+
+.coach-wizard__progress-bar {
+  height: 100%;
+  background: linear-gradient(90deg, var(--coach-primary), var(--coach-ai));
+  border-radius: 999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: .65rem;
+  font-weight: 700;
+  color: #fff;
+  min-width: 3rem;
+  transition: width .25s;
+}
+
+.coach-wizard__step-title {
+  font-size: 1.15rem;
+  font-weight: 600;
+  margin: 0 0 .35rem;
+}
+
+.coach-wizard__microcopy {
+  color: var(--coach-text-muted);
+  font-size: .9rem;
+  margin: 0 0 1rem;
+}
+
+.coach-option-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: .75rem;
+}
+
+.coach-option-card {
+  position: relative;
+  padding: 1rem 1.1rem;
+  border: 2px solid var(--coach-border);
+  border-radius: var(--coach-radius-sm);
+  background: #FAFBFC;
+  cursor: pointer;
+  transition: border-color .15s, box-shadow .15s, background .15s;
+}
+
+.coach-option-card:hover {
+  border-color: #93C5FD;
+  box-shadow: var(--coach-shadow);
+}
+
+.coach-option-card.is-selected {
+  border-color: var(--coach-primary);
+  background: rgba(37, 99, 235, .06);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, .12);
+}
+
+.coach-option-card__label {
+  font-weight: 600;
+  font-size: .95rem;
+}
+
+.coach-option-card input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.coach-wizard__nav {
+  display: flex;
+  gap: .75rem;
+  margin-top: 1.25rem;
+}
+
+/* Floating Coach IA */
+.coach-floating-button {
+  position: fixed;
+  right: 1.5rem;
+  bottom: 1.5rem;
+  z-index: 1000;
+  padding: .85rem 1.25rem;
+  border-radius: 999px;
+  background: linear-gradient(135deg, var(--coach-primary), var(--coach-ai));
+  color: #fff;
+  font-weight: 700;
+  font-size: .9rem;
+  border: none;
+  cursor: pointer;
+  box-shadow: var(--coach-shadow-lg);
+  transition: transform .15s;
+}
+
+.coach-floating-button:hover {
+  transform: translateY(-2px);
+}
+
+.coach-chat-panel {
+  position: fixed;
+  right: 1.5rem;
+  bottom: 5rem;
+  z-index: 999;
+  width: 320px;
+  max-width: calc(100vw - 2rem);
+  background: var(--coach-card);
+  border: 1px solid var(--coach-border);
+  border-radius: var(--coach-radius);
+  box-shadow: var(--coach-shadow-lg);
+  padding: 1rem;
+  display: none;
+}
+
+.coach-chat-panel.is-open {
+  display: block;
+}
+
+.coach-chat-panel__title {
+  font-weight: 700;
+  margin: 0 0 .5rem;
+  font-size: .95rem;
+}
+
+.coach-chat-panel__text {
+  font-size: .85rem;
+  color: var(--coach-text-muted);
+  line-height: 1.45;
+  margin: 0 0 .75rem;
+}
+
+.coach-chat-panel__notice {
+  font-size: .75rem;
+  color: var(--coach-warning);
+  background: rgba(245, 158, 11, .1);
+  padding: .45rem .65rem;
+  border-radius: 8px;
+  margin-bottom: .75rem;
+}
+
+.coach-chat-panel__messages {
+  max-height: 220px;
+  overflow-y: auto;
+  margin-bottom: .75rem;
+  font-size: .85rem;
+}
+
+.coach-chat-panel__msg {
+  margin-bottom: .5rem;
+  padding: .45rem .65rem;
+  border-radius: 8px;
+}
+
+.coach-chat-panel__msg--user {
+  background: rgba(37, 99, 235, .1);
+  margin-left: 1rem;
+}
+
+.coach-chat-panel__msg--assistant {
+  background: #F3F4F6;
+  margin-right: 1rem;
+}
+
+.coach-chat-panel__form {
+  margin-top: .5rem;
+}
+
+.coach-chat-panel__notice.d-none {
+  display: none;
+}
+
+.coach-chat-panel__input {
+  width: 100%;
+  padding: .65rem .75rem;
+  border: 1px solid var(--coach-border);
+  border-radius: var(--coach-radius-sm);
+  font-size: .85rem;
+  background: #F9FAFB;
+  color: var(--coach-text);
+}
+  width: 100%;
+  padding: .65rem .75rem;
+  border: 1px solid var(--coach-border);
+  border-radius: var(--coach-radius-sm);
+  font-size: .85rem;
+  background: #F9FAFB;
+  color: var(--coach-text-muted);
+}
+
+.coach-meta-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  align-items: center;
+  font-size: .85rem;
+  color: var(--coach-text-muted);
+  margin-bottom: 1.25rem;
+}
+
+/* Legacy compat */
+.card-soft {
+  border: 0;
+  border-radius: var(--coach-radius);
+  box-shadow: var(--coach-shadow);
+}
+
+/* Coach ahora — asistente vivo */
+.coach-now {
+  background: linear-gradient(135deg, #1E3A8A 0%, #312E81 50%, #5B21B6 100%);
+  color: #fff;
+  border-radius: var(--coach-radius);
+  padding: 1.35rem 1.5rem;
+  box-shadow: var(--coach-shadow-lg);
+}
+
+.coach-now__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: .5rem;
+}
+
+.coach-now__label {
+  font-size: .75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  opacity: .85;
+}
+
+.coach-now__warning {
+  font-size: .75rem;
+  background: rgba(245, 158, 11, .25);
+  padding: .2rem .6rem;
+  border-radius: 999px;
+}
+
+.coach-now__status {
+  font-size: 1.15rem;
+  font-weight: 700;
+  margin: 0 0 .35rem;
+}
+
+.coach-now__action {
+  margin: 0;
+  opacity: .92;
+  line-height: 1.5;
+  white-space: pre-line;
+}
+
+.coach-now__progress {
+  font-size: .85rem;
+  opacity: .75;
+  margin: .5rem 0 0;
+}
+
+.coach-now__habit {
+  font-size: .9rem;
+  margin: .75rem 0 0;
+  padding: .5rem .75rem;
+  background: rgba(255, 255, 255, .12);
+  border-radius: var(--coach-radius-sm);
+}
+
+.coach-now .coach-btn--primary {
+  background: #fff;
+  color: var(--coach-ai);
+}
+
+.coach-now .coach-btn--secondary,
+.coach-now .coach-btn--ghost {
+  background: rgba(255, 255, 255, .15);
+  color: #fff;
+  border-color: rgba(255, 255, 255, .3);
+}
+
+@media (max-width: 900px) {
+  .coach-shell { grid-template-columns: 1fr; }
+  .coach-sidebar { display: none; }
+  .coach-main { padding: 1rem 1rem 5rem; }
+  .coach-kpi-grid { grid-template-columns: repeat(2, 1fr); }
+  .coach-grid-2 { grid-template-columns: 1fr; }
+  .coach-option-grid { grid-template-columns: 1fr; }
+}

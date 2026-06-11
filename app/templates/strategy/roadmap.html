@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+{% block title %}Roadmap{% endblock %}
+{% block content %}
+<div class="container py-4">
+  <h2 class="mb-4">Roadmap Estratégico</h2>
+
+  <div class="card card-soft mb-4">
+    <div class="card-body">
+      <h5 class="card-title">Nuevo item</h5>
+      <form method="POST" action="{{ url_for('strategy.roadmap_new') }}">
+        <div class="row g-2">
+          <div class="col-md-6">
+            <input type="text" class="form-control" name="nombre" placeholder="Nombre del item" required>
+          </div>
+          <div class="col-md-3">
+            <select class="form-select" name="prioridad">
+              <option value="1">Alta</option>
+              <option value="2" selected>Media</option>
+              <option value="3">Baja</option>
+            </select>
+          </div>
+          <div class="col-md-3">
+            <select class="form-select" name="estado">
+              <option value="planeado" selected>Planeado</option>
+              <option value="en_progreso">En progreso</option>
+              <option value="bloqueado">Bloqueado</option>
+              <option value="completado">Completado</option>
+            </select>
+          </div>
+          <div class="col-12">
+            <textarea class="form-control" name="descripcion" rows="2" placeholder="Descripción"></textarea>
+          </div>
+          <div class="col-md-6">
+            <textarea class="form-control" name="proxima_accion" rows="2" placeholder="Próxima acción"></textarea>
+          </div>
+          <div class="col-md-3">
+            <input type="date" class="form-control" name="fecha_objetivo" placeholder="Fecha objetivo">
+          </div>
+          <div class="col-md-3">
+            <input type="text" class="form-control" name="bloqueado_por" placeholder="Bloqueado por (si aplica)">
+          </div>
+          <div class="col-12">
+            <button type="submit" class="btn btn-primary">Agregar</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  {% if items %}
+    <div class="table-responsive">
+      <table class="table table-sm table-hover align-middle">
+        <thead>
+          <tr>
+            <th style="width:40px">#</th>
+            <th>Item</th>
+            <th>Estado</th>
+            <th>Próxima acción</th>
+            <th>Fecha objetivo</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for r in items %}
+          <tr>
+            <td><span class="badge bg-secondary">{{ r.prioridad }}</span></td>
+            <td><strong>{{ r.nombre }}</strong><br><small class="text-muted">{{ r.descripcion or '' }}</small></td>
+            <td>
+              <form method="POST" action="{{ url_for('strategy.roadmap_update', id=r.id) }}" class="d-flex gap-1">
+                <select class="form-select form-select-sm" name="estado" style="width:120px" onchange="this.form.submit()">
+                  <option value="planeado" {% if r.estado=='planeado' %}selected{% endif %}>Planeado</option>
+                  <option value="en_progreso" {% if r.estado=='en_progreso' %}selected{% endif %}>En progreso</option>
+                  <option value="bloqueado" {% if r.estado=='bloqueado' %}selected{% endif %}>Bloqueado</option>
+                  <option value="completado" {% if r.estado=='completado' %}selected{% endif %}>Completado</option>
+                </select>
+              </form>
+            </td>
+            <td class="small">{{ r.proxima_accion or '—' }}</td>
+            <td>{{ r.fecha_objetivo or '—' }}</td>
+            <td></td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <div class="alert alert-light">No hay items en el roadmap.</div>
+  {% endif %}
+</div>
+{% endblock %}

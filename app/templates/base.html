@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>{% block title %}EasyCoach{% endblock %}</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/coach.css') }}">
+  {% block head %}{% endblock %}
+</head>
+<body class="coach-app">
+  <div class="coach-shell">
+    <aside class="coach-sidebar">
+      <div class="coach-sidebar__brand">
+        <span class="coach-sidebar__brand-mark">EC</span>
+        EasyCoach
+      </div>
+
+      <nav class="coach-sidebar__nav">
+        {% if user_logged_in %}
+          <a class="coach-sidebar__link {% if request.endpoint=='dashboard.dashboard' %}active{% endif %}"
+             href="{{ url_for('dashboard.dashboard') }}">
+            <span data-icon="dashboard"></span> Dashboard
+          </a>
+          <a class="coach-sidebar__link {% if request.endpoint=='ai_wizard.ai_plan' %}active{% endif %}"
+             href="{{ url_for('ai_wizard.ai_plan') }}">
+            <span data-icon="coach"></span> Coach IA
+          </a>
+          <a class="coach-sidebar__link {% if request.endpoint=='treatment_wizard.treatment_wizard' %}active{% endif %}"
+             href="{{ url_for('treatment_wizard.treatment_wizard') }}">
+            <span data-icon="visions"></span> Mi Tratamiento
+          </a>
+          <a class="coach-sidebar__link"
+             href="{{ url_for('dashboard.dashboard') }}">
+            <span data-icon="ritual"></span> Plan Diario
+          </a>
+          <a class="coach-sidebar__link {% if request.endpoint=='activity_wizard.activity_wizard' %}active{% endif %}"
+             href="{{ url_for('activity_wizard.activity_wizard') }}">
+            <span data-icon="plus"></span> Actividad guiada
+          </a>
+          <a class="coach-sidebar__link {% if request.endpoint=='daily_close.close' %}active{% endif %}"
+             href="{{ url_for('daily_close.close') }}">
+            <span data-icon="close"></span> Cierre Diario
+          </a>
+
+          <div class="coach-sidebar__section">Estrategia</div>
+          <a class="coach-sidebar__link {% if request.endpoint=='strategy.decisions_list' %}active{% endif %}"
+             href="{{ url_for('strategy.decisions_list') }}">
+            <span data-icon="decisions"></span> Decisiones
+          </a>
+          <a class="coach-sidebar__link {% if request.endpoint=='strategy.roadmap_list' %}active{% endif %}"
+             href="{{ url_for('strategy.roadmap_list') }}">
+            <span data-icon="roadmap"></span> Roadmap
+          </a>
+
+          <div class="coach-sidebar__section">Progreso</div>
+          <a class="coach-sidebar__link" href="{{ url_for('dashboard.dashboard') }}#coach-logros">
+            <span data-icon="flame"></span> Logros
+          </a>
+          <a class="coach-sidebar__link {% if request.endpoint=='settings.ai_settings' %}active{% endif %}"
+             href="{{ url_for('settings.ai_settings') }}">
+            <span data-icon="dashboard"></span> Configuración
+          </a>
+
+          <div class="coach-sidebar__section">Cuenta</div>
+          <a class="coach-sidebar__link" href="{{ url_for('auth.logout') }}">
+            <span data-icon="logout"></span> Cerrar Sesión
+          </a>
+        {% else %}
+          <a class="coach-sidebar__link {% if request.endpoint=='auth.login' %}active{% endif %}"
+             href="{{ url_for('auth.login') }}">
+            <span data-icon="login"></span> Iniciar Sesión
+          </a>
+          <a class="coach-sidebar__link {% if request.endpoint=='auth.register' %}active{% endif %}"
+             href="{{ url_for('auth.register') }}">
+            <span data-icon="register"></span> Crear Cuenta
+          </a>
+        {% endif %}
+      </nav>
+
+      <div class="coach-sidebar__footer">
+        {% if current_user %}
+          {{ current_user.nombre or current_user.email }}
+        {% else %}
+          EasyCoach v1
+        {% endif %}
+        {% if stats and stats.hoy %} · {{ stats.hoy }}{% endif %}
+      </div>
+    </aside>
+
+    <main class="coach-main">
+      {% block content %}{% endblock %}
+    </main>
+  </div>
+
+  {% if user_logged_in %}
+  <button type="button" id="coachFloatingBtn" class="coach-floating-button" aria-label="Abrir Coach IA">
+    Coach IA
+  </button>
+  <div id="coachChatPanel" class="coach-chat-panel" role="dialog" aria-label="Panel Coach IA">
+    <p class="coach-chat-panel__title">Coach IA</p>
+    <div id="coachChatMessages" class="coach-chat-panel__messages">
+      <p class="coach-chat-panel__text">
+        Hola{% if current_user %}, {{ current_user.nombre or current_user.email.split('@')[0] }}{% endif %}.
+        Puedo ayudarte a revisar tu plan, actividades y prioridades.
+      </p>
+    </div>
+    <div id="coachChatNotice" class="coach-chat-panel__notice d-none"></div>
+    <form id="coachChatForm" class="coach-chat-panel__form">
+      <input type="text" id="coachChatInput" class="coach-chat-panel__input" placeholder="Pregúntale a tu coach…" autocomplete="off">
+      <button type="submit" class="coach-btn coach-btn--primary coach-btn--sm mt-2 w-100">Enviar</button>
+    </form>
+  </div>
+  {% endif %}
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="{{ url_for('static', filename='js/brand.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/coach.js') }}"></script>
+  {% block scripts %}{% endblock %}
+</body>
+</html>

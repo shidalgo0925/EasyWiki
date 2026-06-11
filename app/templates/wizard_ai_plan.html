@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+{% block title %}Coach IA — Plan{% endblock %}
+
+{% block content %}
+<div id="wizardAiPlan" class="coach-wizard">
+  <h1 class="coach-wizard__title">Construyamos tu plan con IA</h1>
+  <p class="coach-wizard__subtitle">
+    Tu coach IA usará tus respuestas para crear un plan diario claro, medible y accionable.
+  </p>
+
+  <div class="coach-wizard__progress">
+    <div id="wizProgress" class="coach-wizard__progress-bar" style="width: 14%;">Paso 1/7</div>
+  </div>
+
+  <div id="step1" class="coach-card mb">
+    <h2 class="coach-wizard__step-title">¿En qué áreas quieres enfocarte?</h2>
+    <p class="coach-wizard__microcopy">
+      Selecciona una o varias áreas. Tu coach IA priorizará las acciones más importantes.
+    </p>
+    <div class="coach-option-grid">
+      <label class="coach-option-card is-selected">
+        <input class="form-check-input" type="checkbox" value="Personal" id="areaPersonal" checked>
+        <span class="coach-option-card__label">Personal</span>
+      </label>
+      <label class="coach-option-card is-selected">
+        <input class="form-check-input" type="checkbox" value="Económico" id="areaEconomico" checked>
+        <span class="coach-option-card__label">Económico</span>
+      </label>
+      <label class="coach-option-card is-selected">
+        <input class="form-check-input" type="checkbox" value="Familiar" id="areaFamiliar" checked>
+        <span class="coach-option-card__label">Familiar</span>
+      </label>
+      <label class="coach-option-card is-selected">
+        <input class="form-check-input" type="checkbox" value="Físico" id="areaFisico" checked>
+        <span class="coach-option-card__label">Físico</span>
+      </label>
+    </div>
+  </div>
+
+  <div id="step2" class="coach-card mb d-none">
+    <h2 class="coach-wizard__step-title">Cuéntame tus metas</h2>
+    <p class="coach-wizard__microcopy">Escribe libremente lo que quieres lograr. No tiene que ser perfecto.</p>
+    <textarea id="metasCrudas" class="form-control" rows="6" placeholder="- Salir de deudas
+- Mejorar salud (caminar 20min diario)
+- Fortalecer relación con mis hijos"></textarea>
+  </div>
+
+  <div id="step3" class="coach-card mb d-none">
+    <h2 class="coach-wizard__step-title">Detalles clave</h2>
+    <p class="coach-wizard__microcopy">Ayuda a tu coach IA a ajustar el plan a tu contexto.</p>
+    <div class="row g-2">
+      <div class="col-md-6">
+        <label class="form-label">Restricciones (JSON)</label>
+        <textarea id="restricciones" class="form-control" rows="4">{ "presupuesto_mensual": 0 }</textarea>
+      </div>
+      <div class="col-md-6">
+        <label class="form-label">Horizonte</label>
+        <select id="horizonte" class="form-select">
+          <option value="30d">30 días</option>
+          <option value="90d" selected>90 días</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <div id="step4" class="coach-card mb d-none">
+    <h2 class="coach-wizard__step-title">Metas SMART (borrador IA)</h2>
+    <pre id="smartPreview" class="bg-light p-2 small mb-0 rounded">-- aún vacío --</pre>
+  </div>
+
+  <div id="step5" class="coach-card mb d-none">
+    <h2 class="coach-wizard__step-title">Rocas semanales + Microacciones</h2>
+    <pre id="breakdownPreview" class="bg-light p-2 small mb-0 rounded">-- aún vacío --</pre>
+  </div>
+
+  <div id="step6" class="coach-card mb d-none">
+    <h2 class="coach-wizard__step-title">Ajuste con Calendario</h2>
+    <p class="coach-wizard__microcopy">Se mapean microacciones a ventanas libres (America/Panama). Si no hay Google conectado, igual puedes continuar.</p>
+    <pre id="calendarPreview" class="bg-light p-2 small mb-0 rounded">-- aún vacío --</pre>
+  </div>
+
+  <div id="step7" class="coach-card mb d-none">
+    <h2 class="coach-wizard__step-title">Revisión y Confirmación</h2>
+    <pre id="finalPreview" class="bg-light p-2 small mb-2 rounded">-- aún vacío --</pre>
+    <button id="btnCommit" class="coach-btn coach-btn--primary">Guardar plan</button>
+    <span id="commitMsg" class="ms-2"></span>
+  </div>
+
+  <div class="coach-wizard__nav">
+    <button id="btnBack" class="coach-btn coach-btn--secondary" disabled>Atrás</button>
+    <button id="btnNext" class="coach-btn coach-btn--primary">Siguiente</button>
+  </div>
+</div>
+{% endblock %}

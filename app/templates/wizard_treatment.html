@@ -1,0 +1,178 @@
+{% extends "base.html" %}
+{% block title %}Wizard de Tratamiento{% endblock %}
+
+{% block content %}
+<div id="wizardTreatment" class="coach-wizard"
+     data-profile-id="{{ profile_id or '' }}"
+     data-initial='{{ initial_data | tojson }}'
+     data-prefill='{{ prefill | tojson }}'>
+
+  <h1 class="coach-wizard__title">Construyamos tu tratamiento de coaching</h1>
+  <p class="coach-wizard__subtitle">
+    Vamos paso a paso para que EasyCoach entienda tu punto de partida y te acompañe cada día.
+  </p>
+
+  {% if active_treatment %}
+  <div class="coach-card mb-3" style="border-left: 4px solid var(--coach-success);">
+    <small class="text-muted">Tratamiento activo desde {{ active_treatment.updated_at.strftime('%Y-%m-%d') if active_treatment.updated_at else '—' }}</small>
+    <p class="mb-0 mt-1"><strong>Área:</strong> {{ active_treatment.primary_area or 'Sin definir' }}</p>
+  </div>
+  {% endif %}
+
+  <div class="coach-wizard__progress">
+    <div id="treatmentProgress" class="coach-wizard__progress-bar" style="width: 14%;">Paso 1/7</div>
+  </div>
+
+  <!-- Paso 1: Diagnóstico -->
+  <div id="tStep1" class="coach-card mb">
+    <h2 class="coach-wizard__step-title">Vamos a entender tu punto de partida</h2>
+    <p class="coach-wizard__microcopy">Cuéntame dónde estás hoy. No tiene que ser perfecto.</p>
+    <div class="mb-3">
+      <label class="form-label">¿Cuál es tu situación actual?</label>
+      <textarea id="currentSituation" class="form-control" rows="3" placeholder="Ej: Lidero EasyTech, múltiples proyectos activos, alta presión de entregas..."></textarea>
+    </div>
+    <div class="mb-3">
+      <label class="form-label">¿Qué problema principal quieres resolver?</label>
+      <textarea id="mainProblem" class="form-control" rows="2" placeholder="Ej: Convertir metas en acciones diarias concretas"></textarea>
+    </div>
+    <div>
+      <label class="form-label">¿Qué área quieres mejorar primero?</label>
+      <select id="primaryArea" class="form-select">
+        <option value="">Selecciona...</option>
+        <option value="Personal">Personal</option>
+        <option value="Económico">Económico</option>
+        <option value="Familiar">Familiar</option>
+        <option value="Físico">Físico</option>
+        <option value="Profesional">Profesional</option>
+        <option value="EasyTech">EasyTech / Negocio</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Paso 2: Objetivos -->
+  <div id="tStep2" class="coach-card mb d-none">
+    <h2 class="coach-wizard__step-title">Ahora definamos tu meta</h2>
+    <p class="coach-wizard__microcopy">Piensa en resultados concretos, no solo intenciones.</p>
+    <div class="mb-3">
+      <label class="form-label">¿Qué quieres lograr en los próximos 30 días?</label>
+      <textarea id="goal30" class="form-control" rows="2"></textarea>
+    </div>
+    <div class="mb-3">
+      <label class="form-label">¿Qué quieres lograr en los próximos 90 días?</label>
+      <textarea id="goal90" class="form-control" rows="2"></textarea>
+    </div>
+    <div>
+      <label class="form-label">¿Cuál sería un resultado exitoso?</label>
+      <textarea id="successDefinition" class="form-control" rows="2" placeholder="¿Cómo sabrás que vas bien?"></textarea>
+    </div>
+  </div>
+
+  <!-- Paso 3: Obstáculos -->
+  <div id="tStep3" class="coach-card mb d-none">
+    <h2 class="coach-wizard__step-title">Identifiquemos qué te está frenando</h2>
+    <p class="coach-wizard__microcopy">Selecciona uno o varios. También puedes describir otro bloqueo.</p>
+    <div class="coach-option-grid mb-3">
+      {% for obs in [
+        ('falta_tiempo', 'Falta de tiempo'),
+        ('falta_enfoque', 'Falta de enfoque'),
+        ('falta_disciplina', 'Falta de disciplina'),
+        ('falta_recursos', 'Falta de recursos'),
+        ('falta_claridad', 'Falta de claridad'),
+        ('otro', 'Otro')
+      ] %}
+      <label class="coach-option-card">
+        <input type="checkbox" class="obstacle-check" value="{{ obs[0] }}">
+        <span class="coach-option-card__label">{{ obs[1] }}</span>
+      </label>
+      {% endfor %}
+    </div>
+    <div>
+      <label class="form-label">¿Qué más te frena? (opcional)</label>
+      <textarea id="obstaclesOther" class="form-control" rows="2" placeholder="Describe bloqueos específicos..."></textarea>
+    </div>
+  </div>
+
+  <!-- Paso 4: Rutina -->
+  <div id="tStep4" class="coach-card mb d-none">
+    <h2 class="coach-wizard__step-title">Conozcamos tu rutina actual</h2>
+    <p class="coach-wizard__microcopy">Esto ayuda a crear un plan realista, no ideal.</p>
+    <div class="row g-3">
+      <div class="col-md-6">
+        <label class="form-label">Hora de inicio del día</label>
+        <input type="time" id="routineStart" class="form-control" value="07:00">
+      </div>
+      <div class="col-md-6">
+        <label class="form-label">Horas disponibles para enfoque</label>
+        <input type="number" id="routineHours" class="form-control" min="1" max="16" value="6">
+      </div>
+      <div class="col-12">
+        <label class="form-label">Bloques de trabajo habituales</label>
+        <textarea id="routineBlocks" class="form-control" rows="2" placeholder="Ej: Mañana técnica, tarde comercial, noche cierre"></textarea>
+      </div>
+      <div class="col-md-6">
+        <label class="form-label">Días de mayor productividad</label>
+        <input type="text" id="routineBestDays" class="form-control" placeholder="Ej: Martes, Jueves">
+      </div>
+      <div class="col-md-6">
+        <label class="form-label">Hábitos actuales</label>
+        <input type="text" id="routineHabits" class="form-control" placeholder="Ej: Revisión matutina, cierre nocturno">
+      </div>
+    </div>
+  </div>
+
+  <!-- Paso 5: Compromiso -->
+  <div id="tStep5" class="coach-card mb d-none">
+    <h2 class="coach-wizard__step-title">¿Qué nivel de compromiso traes?</h2>
+    <p class="coach-wizard__microcopy">Sé honesto contigo. El coach se adapta a tu ritmo.</p>
+    <div class="coach-option-grid">
+      {% for lvl in [('bajo', 'Bajo'), ('medio', 'Medio'), ('alto', 'Alto'), ('intensivo', 'Intensivo')] %}
+      <label class="coach-option-card commitment-card">
+        <input type="radio" name="commitment" class="commitment-radio" value="{{ lvl[0] }}">
+        <span class="coach-option-card__label">{{ lvl[1] }}</span>
+      </label>
+      {% endfor %}
+    </div>
+  </div>
+
+  <!-- Paso 6: Preferencias -->
+  <div id="tStep6" class="coach-card mb d-none">
+    <h2 class="coach-wizard__step-title">Construyamos tu acompañamiento</h2>
+    <p class="coach-wizard__microcopy">Elige cómo quieres que EasyCoach te acompañe.</p>
+    <div class="coach-option-grid">
+      {% for pref in [
+        ('daily_plan', 'Plan diario'),
+        ('reminders', 'Recordatorios'),
+        ('weekly_review', 'Revisión semanal'),
+        ('delay_alerts', 'Alertas de retraso'),
+        ('ai_recommendations', 'Recomendaciones IA')
+      ] %}
+      <label class="coach-option-card">
+        <input type="checkbox" class="pref-check" value="{{ pref[0] }}">
+        <span class="coach-option-card__label">{{ pref[1] }}</span>
+      </label>
+      {% endfor %}
+    </div>
+  </div>
+
+  <!-- Paso 7: Resumen -->
+  <div id="tStep7" class="coach-card mb d-none">
+    <h2 class="coach-wizard__step-title">Resumen de tu tratamiento</h2>
+    <p class="coach-wizard__microcopy">Revisa antes de activar. Puedes editar después.</p>
+    <pre id="treatmentSummary" class="bg-light p-3 rounded small mb-3" style="white-space:pre-wrap;"></pre>
+    <div class="d-flex flex-wrap gap-2">
+      <button id="btnActivate" class="coach-btn coach-btn--primary">Generar tratamiento</button>
+      <button id="btnSaveDraft" class="coach-btn coach-btn--secondary">Guardar borrador</button>
+    </div>
+    <span id="treatmentMsg" class="d-block mt-2 small"></span>
+  </div>
+
+  <div class="coach-wizard__nav">
+    <button id="treatmentBtnBack" class="coach-btn coach-btn--secondary" disabled>Atrás</button>
+    <button id="treatmentBtnNext" class="coach-btn coach-btn--primary">Siguiente</button>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/treatment.js') }}"></script>
+{% endblock %}

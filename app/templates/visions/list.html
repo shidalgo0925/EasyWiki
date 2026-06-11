@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %}Visiones{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h4 class="m-0">Mis Visiones</h4>
+  <a href="{{ url_for('visions.new_vision') }}" class="btn btn-primary btn-sm">+ Nueva Visión</a>
+</div>
+{% if visions %}
+<div class="row g-3">
+  {% for v in visions %}
+  <div class="col-md-6 col-lg-4">
+    <div class="card card-soft p-3">
+      <div class="d-flex align-items-center mb-2">
+        <span style="width:14px;height:14px;border-radius:50%;background:{{ v.color }};display:inline-block;margin-right:8px;"></span>
+        <h6 class="m-0">{{ v.titulo }}</h6>
+      </div>
+      <p class="text-muted small mb-2">{{ v.descripcion or 'Sin descripción' }}</p>
+      <div class="d-flex justify-content-between align-items-center">
+        <small class="text-secondary">Horizonte: {{ v.horizonte }}</small>
+        <div class="d-flex gap-1">
+          <a href="{{ url_for('visions.view_vision', id=v.id) }}" class="btn btn-outline-secondary btn-sm">Ver</a>
+          <a href="{{ url_for('visions.edit_vision', id=v.id) }}" class="btn btn-outline-primary btn-sm">Editar</a>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% else %}
+<div class="text-muted">Aún no tienes visiones. <a href="{{ url_for('visions.new_vision') }}">Crea la primera</a>.</div>
+{% endif %}
+{% endblock %}

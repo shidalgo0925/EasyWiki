@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+{% block title %}Configuración IA{% endblock %}
+
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/settings.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="settings-page">
+  <header class="settings-header">
+    <h1>Configuración</h1>
+    <button type="submit" form="aiConfigForm" class="coach-btn coach-btn--primary">Done</button>
+  </header>
+
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% for cat, msg in messages %}
+    <div class="settings-flash settings-flash--{{ cat }}">{{ msg }}</div>
+    {% endfor %}
+  {% endwith %}
+
+  <section class="settings-panel">
+    <h2 class="settings-panel__title">API Configuration</h2>
+
+    <form id="aiConfigForm" method="POST" action="{{ url_for('settings.ai_settings') }}">
+      <div class="settings-field">
+        <label for="api_provider">API Provider</label>
+        <select id="api_provider" name="api_provider" class="settings-input">
+          {% for key, meta in providers.items() %}
+          <option value="{{ key }}" {% if cfg.api_provider == key %}selected{% endif %}>{{ key | capitalize }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div class="settings-field settings-field--check">
+        <label>
+          <input type="checkbox" id="use_custom_base_url" name="use_custom_base_url" value="1"
+            {% if cfg.use_custom_base_url %}checked{% endif %}>
+          Use custom base URL
+        </label>
+      </div>
+
+      <div class="settings-field" id="baseUrlField">
+        <input type="url" id="base_url" name="base_url" class="settings-input"
+          value="{{ cfg.base_url }}" placeholder="http://194.60.201.29:11434">
+      </div>
+
+      <div class="settings-field">
+        <label for="api_key" id="apiKeyLabel">API Key</label>
+        <input type="password" id="api_key" name="api_key" class="settings-input"
+          placeholder="{% if cfg.api_key_set %}•••••••• (guardada — dejar vacío para mantener){% else %}Enter API Key (optional)...{% endif %}"
+          autocomplete="off">
+        <p class="settings-hint" id="apiKeyHint">
+          Optional API key for authenticated instances. Leave empty for local Ollama.
+        </p>
+      </div>
+
+      <div class="settings-field">
+        <label for="model">Model</label>
+        <div class="settings-model-row">
+          <input type="text" id="model" name="model" class="settings-input" list="modelList"
+            value="{{ cfg.model }}">
+          <datalist id="modelList"></datalist>
+          <button type="button" id="btnLoadModels" class="settings-icon-btn" title="Cargar modelos">↻</button>
+        </div>
+      </div>
+
+      <div class="settings-field">
+        <label for="context_window">Model Context Window</label>
+        <input type="number" id="context_window" name="context_window" class="settings-input"
+          value="{{ cfg.context_window }}" min="512" max="200000" step="512">
+      </div>
+
+      <div class="settings-field">
+        <label for="request_timeout_ms">Request Timeout (ms)</label>
+        <input type="number" id="request_timeout_ms" name="request_timeout_ms" class="settings-input"
+          value="{{ cfg.request_timeout_ms }}" min="5000" max="600000" step="1000">
+        <p class="settings-hint">Maximum time in milliseconds to wait for API responses before timing out.</p>
+      </div>
+
+      <div class="settings-field settings-field--check">
+        <label>
+          <input type="checkbox" id="use_compact_prompt" name="use_compact_prompt" value="1"
+            {% if cfg.use_compact_prompt %}checked{% endif %}>
+          Use compact prompt
+        </label>
+        <p class="settings-hint">A system prompt optimized for smaller context window (e.g. 8k or less).</p>
+      </div>
+
+      <p class="settings-warning" id="providerWarning"></p>
+      <p class="settings-footer-hint" id="providerHint">{{ provider_hint }}</p>
+
+      <div class="settings-actions">
+        <button type="button" id="btnTestConnection" class="coach-btn coach-btn--secondary">Probar conexión</button>
+        <span id="testResult" class="settings-test-result"></span>
+      </div>
+    </form>
+  </section>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+window.AI_SETTINGS = {{ {
+  "providers": providers,
+  "modelSuggestions": model_suggestions,
+  "current": cfg
+} | tojson }};
+</script>
+<script src="{{ url_for('static', filename='js/settings_ai.js') }}"></script>
+{% endblock %}
