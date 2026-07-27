@@ -1,7 +1,7 @@
 # CODITO — Servidor lógico (Relatic Panamá)
 
 Documento maestro del host que opera la **instancia EN1 de Relatic Panamá** y co-aloja el laboratorio operativo EasyTech.  
-**Auditoría en vivo** · inspección `2026-06-05` · sin cambios en servicios.
+**Auditoría en vivo** · última inspección `2026-07-27` (capacidad memoria/disco + servicios) · baseline anterior `2026-06-05` · sin cambios en servicios en esta pasada.
 
 ---
 
@@ -24,19 +24,34 @@ Documento maestro del host que opera la **instancia EN1 de Relatic Panamá** y c
 
 ## Fase 1 — Inventario de hardware y red
 
-Inspección directa en servidor · `2026-06-05`.
+Inspección directa en servidor · `2026-07-27` (capacidad) · hardware base sin cambio desde `2026-06-05`.
 
 | Campo | Valor |
 |-------|-------|
 | **Proveedor** | Contabo |
 | **VPS / ID** | `vmi3225509` *(plan comercial exacto: confirmar en panel Contabo)* |
 | **CPU** | 16 vCPU — AMD EPYC (with IBPB) |
-| **RAM** | 64 GiB (62 GiB usable) |
-| **Disco** | ~581 GiB (`/dev/sda1`), **42 GiB usados (~8 %)** |
+| **RAM** | 64 GiB (62 GiB usable) · **usada ~5,2 GiB** · **disponible ~57 GiB** |
+| **Swap** | **0** (sin swap configurado) |
+| **Disco** | ~581 GiB (`/dev/sda1`), **65 GiB usados (~12 %)** · **516 GiB libres** |
+| **Inodos** | ~1 % usados |
 | **Sistema operativo** | Ubuntu 24.04.4 LTS (noble), kernel 6.8.0-111-generic |
 | **IP pública** | `194.60.201.29` |
 | **IP privada** | **N/A** — VPS sin VPC; red interna solo bridge Docker `172.17.0.0/16` (host `172.17.0.1`) |
 | **Gateway** | `194.60.201.1` |
+
+### Capacidad — desglose disco (`2026-07-27`)
+
+| Ruta | Tamaño | Nota |
+|------|--------|------|
+| `/usr` | ~37 GiB | Sistema / paquetes |
+| `/var` | ~15 GiB | Incluye journal (~2,7 GiB en `/var/log/journal`) |
+| `/home/dev` | ~8,4 GiB | Caches IDE (`.vscode-server`, `.cursor-server`, `.npm`) |
+| `/opt` | ~5,3 GiB | Apps (EN1 3,4 · ClassOne 1,5 · Thesis 0,4) |
+| PostgreSQL data | ~251 MiB | `/var/lib/postgresql/16/main` |
+| Backups EN1 | ~467 MiB | `/opt/easynodeone/backups` (~227 archivos) |
+
+**Veredicto capacidad:** holgado (RAM ~8 % usada, disco ~12 %). Sin presión inmediata. Candidatos de limpieza no urgente: journal, caches IDE, rotación de backups locales.
 
 ---
 
@@ -48,12 +63,13 @@ Inspección directa en servidor · `2026-06-05`.
 | **EN1 Dev** | Desarrollo Easy NodeOne | ✅ Activo | Flask + Gunicorn | `/opt/easynodeone/dev/app` | `easynodeone-dev.service`, BD `easynodeone_dev`, Nginx `appdev.easynodeone.com` |
 | **EN1 Staging** | Preproducción EN1 | ✅ Activo | Flask + Gunicorn | `/opt/easynodeone/staging/app` | `easynodeone-staging.service`, BD `easynodeone_staging`, Nginx `apptst.easynodeone.com` |
 | **EN1 Prod** | Producción otros clientes EN1 | ✅ Activo | Flask + Gunicorn | `/opt/easynodeone/prod/app` | `easynodeone-prod.service`, BD `easynodeone_prod`, Nginx `appprd.easynodeone.com` |
+| **EN1 Relatic Panamá DEV** | Clon aislado Relatic (lab) | ✅ Activo | Flask + Gunicorn | `/opt/easynodeone/relatic-panama-dev/app` | `easynodeone-relatic-panama-dev.service`, BD `relatic_panama_dev`, puerto `9105` |
 | **Relatic — landing** | Marketing estático `abril26.relatic.org` | ✅ Activo | Vite/React → Nginx estático | `/opt/easynodeone/landings/relatic-public` → `/var/www/abril26.relatic.org` | Repo `relatic-public`, Let's Encrypt |
 | **RelaticV2** | Front experimental (no sustituye EN1) | ⚠️ Desplegado en disco, sin Nginx dedicado observado | Vite | `/opt/easynodeone/dev/relaticV2-github` | Repo GitHub `Gill3010/relaticV2` |
-| **Open WebUI** | Chat IA interno | ✅ Activo (healthy) | Docker `ghcr.io/open-webui/open-webui:main` | Contenedor `open-webui` | Nginx `ai.easynodeone.com`, volúmen Docker, SQLite interno |
-| **LiteLLM** | Proxy API LLM (Continue, `/v1/`) | ✅ Activo | Docker `litellm-en1:latest` | `/opt/ai-stack/litellm/` | Nginx `ai.easynodeone.com`, `api-ai.easynodeone.com`, config YAML |
-| **Ollama** | Modelos LLM locales | ✅ Activo | systemd `ollama.service` | `/usr/local/bin/ollama` | Usado por LiteLLM/Open WebUI según config |
-| **ai.easynodeone.com** | Portal IA (UI + API) | ✅ Activo | Nginx → Open WebUI + LiteLLM | `/etc/nginx/sites-enabled/ai.easynodeone.com` | TLS Let's Encrypt, upstream Docker |
+| **Open WebUI** | Chat IA interno | ⏸️ Contenedor **Exited** (desde ~3 d) | Docker `ghcr.io/open-webui/open-webui:main` | Contenedor `open-webui` | Nginx `ai.easynodeone.com`, volúmen Docker, SQLite interno |
+| **LiteLLM** | Proxy API LLM (Continue, `/v1/`) | ⏸️ Contenedor **Exited** (desde ~3 d) | Docker `ghcr.io/berriai/litellm-database:main-stable` | `/opt/ai-stack/litellm/` | Nginx `ai.easynodeone.com`, `api-ai.easynodeone.com`, `litellm-db` también Exited |
+| **Ollama** | Modelos LLM locales | ⏸️ **inactive** | systemd `ollama.service` | `/usr/local/bin/ollama` | Usado por LiteLLM/Open WebUI cuando está up |
+| **ai.easynodeone.com** | Portal IA (UI + API) | ⚠️ Nginx up · backends Docker down | Nginx → Open WebUI + LiteLLM | `/etc/nginx/sites-enabled/ai.easynodeone.com` | TLS Let's Encrypt |
 | **Easy Wiki** | Documentación interna (Markdown) | ✅ Repo local | Git / Obsidian-style | `/opt/easynodeone/dev/EasyWiki` | **No servido por Nginx** en este host |
 | **EasyThesis** | Plataforma tesis | ✅ Activo | Flask + Gunicorn | `/opt/easythesis/app` | `easythesis-dev.service`, BD `easythesis_dev`, Nginx `ethesis.site` |
 | **Easy Class One** | LMS (dev/staging/prod) | ✅ Activo | Flask + Gunicorn | `/opt/easyclassone/{dev,staging,prod}/app` | systemd `easyclassone-*.service`, BD PostgreSQL, Nginx `eclassone.com` |
@@ -69,35 +85,39 @@ Inspección directa en servidor · `2026-06-05`.
 
 Las aplicaciones Python se gestionan con **systemd + Gunicorn**. Inventario equivalente:
 
-| Aplicación (systemd) | Estado | Puerto | RAM (aprox.) | CPU acum. |
-|----------------------|--------|--------|--------------|-----------|
-| `easynodeone-relatic.service` | active | 9103 | ~436 MiB | alto (prod cliente) |
-| `easynodeone-prod.service` | active | 9102 | ~395 MiB | medio |
-| `easynodeone-dev.service` | active | 9101 | ~384 MiB | medio |
-| `easynodeone-staging.service` | active | 9104 | ~364 MiB | bajo |
-| `easythesis-dev.service` | active | 9201 | ~350 MiB | medio |
-| `easyclassone-prod.service` | active | 9204 | ~278 MiB | medio |
-| `easyclassone-dev.service` | active | 9202 | ~232 MiB | medio |
-| `easyclassone-staging.service` | active | 9203 | ~190 MiB | medio |
+| Aplicación (systemd) | Estado | Puerto | RAM (`MemoryCurrent`) | Nota |
+|----------------------|--------|--------|------------------------|------|
+| `easynodeone-relatic.service` | active | 9103 | ~651 MiB | Prod cliente Relatic |
+| `easynodeone-dev.service` | active | 9101 | ~439 MiB | RSS workers Gunicorn ~851 MiB (7 procs) |
+| `easynodeone-prod.service` | active | 9102 | ~424 MiB | |
+| `easynodeone-staging.service` | active | 9104 | ~402 MiB | |
+| `easythesis-dev.service` | active | 9201 | ~351 MiB | |
+| `easyclassone-prod.service` | active | 9204 | ~278 MiB | |
+| `easyclassone-dev.service` | active | 9202 | ~223 MiB | |
+| `easynodeone-relatic-panama-dev.service` | active | 9105 | ~216 MiB | Clon lab Panamá |
+| `easyclassone-staging.service` | active | 9203 | ~191 MiB | |
+| `ollama.service` | **inactive** | — | — | Stack IA abajo |
 
-*RAM vía `systemctl show … MemoryCurrent` · 2026-06-05.*
+*RAM vía `systemctl show … MemoryCurrent` · `2026-07-27`. PostgreSQL cluster ~1,0 GiB RSS (40 procs). Host total usado ~5,2 GiB.*
 
 ---
 
 ## Fase 4 — Docker
 
 ```text
-docker ps -a   # 2026-06-05 — 2 contenedores, ambos Up ~3 semanas
+docker ps -a   # 2026-07-27 — stack IA detenido (Exited ~3 días)
 ```
 
 | Contenedor | Imagen | Estado | Volúmenes / binds | Puertos (host) |
 |------------|--------|--------|-------------------|----------------|
-| `litellm` | `litellm-en1:latest` | running | `/opt/ai-stack/litellm/config.yaml` → `/app/proxy_server_config.yaml` (ro) | `127.0.0.1:4000→4000` |
-| `open-webui` | `ghcr.io/open-webui/open-webui:main` | running (healthy) | volúmen `open-webui` → `/app/backend/data` (**~1,1 GiB**: `webui.db`, `vector_db`, `uploads`, `cache`) | `127.0.0.1:3000→8080` |
+| `litellm` | `ghcr.io/berriai/litellm-database:main-stable` | **Exited (137)** ~3 d | config en `/opt/ai-stack/litellm/` | *(down)* `127.0.0.1:4000` |
+| `litellm-db` | `postgres:16` | **Exited (0)** ~3 d | BD auxiliar LiteLLM | — |
+| `open-webui` | `ghcr.io/open-webui/open-webui:main` | **Exited (137)** ~3 d | volúmen `open-webui` → `/app/backend/data` | *(down)* `127.0.0.1:3000` |
+| `jovial_spence` / `funny_noether` | `fc15e199e743` | Exited (127) ~3 sem | restos | — |
 
-**Volúmenes Docker:** `open-webui` (local driver).
+**Volúmenes Docker:** `open-webui` (local driver) — datos siguen en disco aunque el contenedor esté parado.
 
-**Servicio adicional fuera de Docker:** `ollama.service` (systemd, ~469 MiB RSS).
+**Servicio adicional fuera de Docker:** `ollama.service` — **inactive** (`2026-07-27`).
 
 ---
 
@@ -135,17 +155,18 @@ Fuentes: `/etc/nginx/sites-enabled/`, `/etc/nginx/conf.d/`.
 
 | Motor | BD | Tamaño | Aplicación | Criticidad |
 |-------|-----|--------|------------|------------|
-| PostgreSQL 16 | `easynodeone_relatic` | ~21 MB | EN1 Relatic | **CRÍTICA** |
-| PostgreSQL 16 | `easynodeone_prod` | ~18 MB | EN1 Prod | ALTA |
-| PostgreSQL 16 | `easynodeone_staging` | ~18 MB | EN1 Staging | MEDIA |
-| PostgreSQL 16 | `easynodeone_dev` | ~21 MB | EN1 Dev | MEDIA |
-| PostgreSQL 16 | `easynodeone_dev_relatic_clone` | ~15 MB | Clon pruebas | BAJA |
+| PostgreSQL 16 | `easynodeone_dev` | ~27 MB | EN1 Dev | MEDIA |
+| PostgreSQL 16 | `easynodeone_relatic` | ~24 MB | EN1 Relatic | **CRÍTICA** |
+| PostgreSQL 16 | `easynodeone_prod` | ~21 MB | EN1 Prod | ALTA |
+| PostgreSQL 16 | `relatic_panama_dev` | ~21 MB | EN1 Relatic Panamá DEV | MEDIA |
+| PostgreSQL 16 | `easynodeone_staging` | ~21 MB | EN1 Staging | MEDIA |
 | PostgreSQL 16 | `easythesis_dev` | ~18 MB | EasyThesis | MEDIA |
-| PostgreSQL 16 | `easyclassone_dev` | ~16 MB | ECO Dev | MEDIA |
-| PostgreSQL 16 | `easyclassone_staging` | ~15 MB | ECO Staging | MEDIA |
+| PostgreSQL 16 | `easyclassone_dev` | ~17 MB | ECO Dev | MEDIA |
+| PostgreSQL 16 | `easyclassone_staging` | ~16 MB | ECO Staging | MEDIA |
+| PostgreSQL 16 | `easynodeone_dev_relatic_clone` | ~15 MB | Clon pruebas | BAJA |
 | PostgreSQL 16 | `easyclassone_prod` | ~15 MB | ECO Prod | ALTA |
 
-**Cluster total:** ~214 MiB en `/var/lib/postgresql/16/main`.
+**Cluster total:** ~251 MiB en `/var/lib/postgresql/16/main` · `2026-07-27`.
 
 ### SQLite (por silo EN1)
 
@@ -169,17 +190,18 @@ Fuentes: `/etc/nginx/sites-enabled/`, `/etc/nginx/conf.d/`.
 
 | Proyecto | Ruta | Remoto | Rama | Último commit |
 |----------|------|--------|------|---------------|
-| EN1 Dev | `/opt/easynodeone/dev/app` | `git@github.com:shidalgo0925/Easy-NodeOne.git` | `develop` | `2b3d585` · 2026-06-04 · docs EN1 |
-| EN1 Staging | `/opt/easynodeone/staging/app` | `https://github.com/shidalgo0925/Easy-NodeOne.git` | `main` | `deaf1df` · 2026-06-04 · merge develop→staging |
-| EN1 Prod | `/opt/easynodeone/prod/app` | `https://github.com/shidalgo0925/Easy-NodeOne.git` | `main` | `deaf1df` · 2026-06-04 |
-| EN1 Relatic | `/opt/easynodeone/relatic/app` | `git@github.com:shidalgo0925/Easy-NodeOne.git` | `develop` | `5d78e1c` · 2026-06-03 · fix pagos |
-| Landing Relatic | `/opt/easynodeone/landings/relatic-public` | `git@github.com:shidalgo0925/relatic-public.git` | `main` | `655a4aa` · 2026-04-27 |
-| RelaticV2 | `/opt/easynodeone/dev/relaticV2-github` | `https://github.com/Gill3010/relaticV2.git` | `main` | `e085bad` · 2026-03-20 |
-| Easy Wiki | `/opt/easynodeone/dev/EasyWiki` | `git@github.com:shidalgo0925/EasyWiki.git` | `main` | `b9b10b4` · 2026-06-05 |
+| EN1 Dev | `/opt/easynodeone/dev/app` | `git@github.com:shidalgo0925/Easy-NodeOne.git` | `develop` | `b8bdf25` · 2026-07-27 · EPosOne menú digital / sidebar UX |
+| EN1 Staging | `/opt/easynodeone/staging/app` | `https://github.com/shidalgo0925/Easy-NodeOne.git` | detached `b8bdf25` | `b8bdf25` · 2026-07-27 |
+| EN1 Prod | `/opt/easynodeone/prod/app` | `https://github.com/shidalgo0925/Easy-NodeOne.git` | detached `f425914` | `f425914` · 2026-07-27 · merge develop (ADR-016 + UX) |
+| EN1 Relatic | `/opt/easynodeone/relatic/app` | `git@github.com:shidalgo0925/Easy-NodeOne.git` | `hotfix/relatic-password-reset` | `51b1ceb` · 2026-07-14 · certificados / membresía |
+| EN1 Relatic Panamá DEV | `/opt/easynodeone/relatic-panama-dev/app` | **Sin `.git` local** | — | Clon de trabajo; no es silo de deploy Git estándar |
+| Landing Relatic | `/opt/easynodeone/landings/relatic-public` | `git@github.com:shidalgo0925/relatic-public.git` | `main` | `655a4aa` · 2026-04-27 *(no revalidado 2026-07-27)* |
+| RelaticV2 | `/opt/easynodeone/dev/relaticV2-github` | `https://github.com/Gill3010/relaticV2.git` | `main` | `e085bad` · 2026-03-20 *(no revalidado)* |
+| Easy Wiki | `/opt/easynodeone/dev/EasyWiki` | `git@github.com:shidalgo0925/EasyWiki.git` | `main` | `a934e64` · 2026-06-05 · *(este doc actualizado en working tree 2026-07-27)* |
 | EasyThesis | `/opt/easythesis/app` | `git@github.com-easythesis:shidalgo0925/Ethesis.git` | `main` | `86ea0c5` · 2026-05-23 |
 | Easy Class One | `/opt/easyclassone/*/app` | **Sin `.git` local** | — | Despliegue sin repo en disco |
 
-**Nota:** silo Relatic en rama `develop` mientras la política operativa documenta `main`/`relatic` — ver Riesgos.
+**Nota:** silo Relatic en `hotfix/relatic-password-reset` (no `main`/`relatic`) — ver Riesgos. Staging/prod en detached HEAD en commits de deploy acordados.
 
 ---
 
@@ -202,7 +224,7 @@ Fuentes: `/etc/nginx/sites-enabled/`, `/etc/nginx/conf.d/`.
 **Script:** `/opt/easynodeone/scripts/backup-easynodeone.sh`  
 **Cron:** `/etc/cron.d/easynodeone` → `0 2 * * * root …`  
 **Log:** `/var/log/easynodeone-backup-sql.log`  
-**Retención observada:** ~121 archivos, ~176 MiB total en `/opt/easynodeone/backups/` (sin rotación automática documentada).
+**Retención observada (`2026-07-27`):** ~227 archivos, **~467 MiB** total en `/opt/easynodeone/backups/` (sin rotación automática documentada).
 
 **Diseño off-site (OCI):** alcance **producción crítica únicamente** — ver **Fase 9** · [[00_Gobierno/disaster_recovery_codito#9-plan-backup-off-site-oci-diseño]] · **sin implementar**.
 
@@ -211,8 +233,9 @@ Fuentes: `/etc/nginx/sites-enabled/`, `/etc/nginx/conf.d/`.
 ## Fase 9 — Backup off-site OCI *(alcance aprobado · sin implementar)*
 
 **Backup Hub:** OCI Object Storage · prefijo `backups/codito/`  
-**Medición en vivo:** `2026-06-05` · CODITO `194.60.201.29`  
-**Estado:** inventario + dimensionamiento · **no cron · no copias**
+**Medición en vivo (dimensionamiento OCI):** `2026-06-05` · CODITO `194.60.201.29`  
+**Estado:** inventario + dimensionamiento · **no cron · no copias**  
+*(Los tamaños de §9.1 no se re-midieron el 2026-07-27; revalidar antes de implementar.)*
 
 ### 9.0 Clasificación oficial CODITO
 
@@ -406,10 +429,12 @@ Bucket propuesto: `easytech-backups` · retención sugerida: PG Relatic **90 d**
 | Riesgo | Impacto | Mitigación |
 |--------|---------|------------|
 | VPS compartido | Deploy erróneo afecta vecinos | Ventanas, ramas y `.env` por silo |
-| Rama Relatic = `develop` | Desalineación con política `main` | Acordar rama única |
+| Relatic en `hotfix/…` (no `main`/`relatic`) | Desalineación con política de ramas | Acordar rama única y documentar freeze |
 | Backup solo local | Pérdida VPS = pérdida backups | Plan OCI diseñado (Fase 9) — **implementación pendiente** |
+| Stack IA detenido | `ai.easynodeone.com` sin backend | Reiniciar Open WebUI / LiteLLM / Ollama si se necesitan |
 | Open WebUI sin backup | Pérdida historial IA | Fase CODITO-4 — **pendiente** |
 | Secretos solo en `.env` prod/relatic | No recuperables desde Git | Fase CODITO-2 — **pendiente** |
+| Sin swap | OOM killer ante pico extremo | Opcional: 4–8 GiB swap (no urgente con ~57 GiB libres) |
 
 ---
 
