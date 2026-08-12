@@ -47,6 +47,12 @@ Ver [[04_Clientes/modecosa]] y [[06_Arquitectura/arquitectura_api]].
 - Sincronizar inventario completo bidireccional con cualquier ERP sin proyecto dedicado.
 - Guardar credenciales de admin Odoo en EN1 para Fase 1 de matriz.
 
+## M2M / credenciales (EN1 ↔ productos)
+
+- **ADR-037** — Integrations M2M, Credentials & Operations (propuesto, review ESB): [[00_Gobierno/ADR/ADR-037-INTEGRATIONS-M2M-CREDENTIALS-OPERATIONS]]
+- Canónico en producto: repo `Easy-NodeOne` · `develop` · `docs/ADR-037-INTEGRATIONS-M2M-CREDENTIALS-OPERATIONS.md`
+- **No** es ADR-009 (Caja EN1).
+
 ---
 
 **Suite:** [[02_Suite/mapa_suite]]
